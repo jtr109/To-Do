@@ -132,14 +132,14 @@ def password_reset(token):
     return render_template('auth/reset_password.html', form=form)
 
 
-@auth.route('/change_email')
+@auth.route('/change_email', methods=['GET', 'POST'])
 @login_required
 def change_email_request():
     form = ChangeEmailForm()
     if form.validate_on_submit():
         if current_user.verify_password(form.password.data):
             new_email = form.new_email.data
-            token = current_user.generate_changing_email_address(new_email)
+            token = current_user.generate_changing_email_request(new_email)
             send_email(new_email, 'Change your email address',
                        'auth/email/change_email', user=current_user, token=token)
             flash('An confrimation email has been sent to you.')
