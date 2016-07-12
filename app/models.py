@@ -2,6 +2,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
+from datetime import datetime
 
 from . import db
 from . import login_manager
@@ -25,6 +26,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    todo_lists = db.relationship('ToDoList', backref='master', lazy='dynamic')
 
     @property
     def password(self):
@@ -97,3 +99,28 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+class ToDoList(db.Model):
+    __tablename__ = 'todo-lists'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    master_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    tasks = db.relationship('Task', backref='in_list', lazy='dynamic')
+
+    def __repr__(self):
+        return '<ToDoList %r>' % self.id
+
+
+class Task(db.Model):
+    __tablename__ = 'tasks'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.String(64))  # todo: Is 'db.String' enough?
+    state = db.Column(db.String(64), default='todo')
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    list_id = db.Column(db.Integer, db.ForeignKey('todo-lists.id'))
+
+    def __repr__(self):
+        return '<Task %r>' % self.id
+
