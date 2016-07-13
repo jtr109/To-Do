@@ -133,30 +133,24 @@ class Task(db.Model):
         self.state = 'todo'
         self.timestamp = datetime.utcnow()
         self.generate_switch_event(original_state)
-        db.session.add(self)
-        db.session.commit()
 
     def change_into_doing(self):
         original_state = self.state
         self.state = 'doing'
         self.timestamp = datetime.utcnow()
         self.generate_switch_event(original_state)
-        db.session.add(self)
-        db.session.commit()
 
     def change_into_done(self):
         original_state = self.state
         self.state = 'done'
         self.timestamp = datetime.utcnow()
         self.generate_switch_event(original_state)
-        db.session.add(self)
-        db.session.commit()
 
     def delete_task(self):
-        db.session.delete(self)
-        event = ListEvent(event='Delete task "%s".' % self.body)
+        event = ListEvent(event='Delete task "%s".' % self.body,
+                          list_id=self.list_id)
         db.session.add(event)
-        db.session.commit()
+        db.session.delete(self)
 
     def generate_switch_event(self, original_state):
         event = ListEvent(event='Change "%s" from "%s" to "%s".' % (self.body, original_state, self.state),

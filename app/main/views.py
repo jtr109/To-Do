@@ -20,7 +20,8 @@ def index():
                           list_id=todo_list.id)
         db.session.add(event)
         return redirect(url_for('.todo_list_details', list_id=todo_list.id))
-    return render_template('index.html', form=form)
+    todo_lists = ToDoList.query.order_by(ToDoList.timestamp.desc()).filter_by(master=current_user)
+    return render_template('index.html', form=form, todo_lists=todo_lists)
 
 
 @main.route('/list/<int:list_id>', methods=['GET', 'POST'])
@@ -33,7 +34,10 @@ def todo_list_details(list_id):
     form = AddTaskForm()
     if form.validate_on_submit():
         task = Task(body=form.task.data,
-                    in_list=current_list)
+                    list_id=list_id)
+        event = ListEvent(event='Create task: "%s".' % form.task.data,
+                          list_id=list_id)
+        db.session.add(event)
         db.session.add(task)
         return redirect(url_for('.todo_list_details', list_id=list_id))
     todo_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='todo')
@@ -57,11 +61,7 @@ def delete_todo_list(list_id):
 @login_required
 def change_to_todo(task_id):
     task = Task.query.filter_by(id=task_id).first()
-    original_state = task.state
     task.change_into_todo()
-    event = ListEvent(event='Change "%s" from "%s" to "to do".' % (task.body, original_state),
-                      list_id=task.list_id)
-    db.session.add(event)
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
 

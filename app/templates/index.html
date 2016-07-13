@@ -15,7 +15,22 @@
         !
     </h1>
 </div>
-<div class="col-md-4">
+<div>
     {{ wtf.quick_form(form) }}
 </div>
+<ul class="posts">
+    {% for todo_list in todo_lists %}
+    <li class="post">
+        <div class="post-content">
+            <div class="post-date">{{ moment(todo_list.timestamp).fromNow() }}</div>
+            <div class="post-author">
+                <a href="{{ url_for('main.todo_list_details', list_id=todo_list.id) }}">
+                    {{ todo_list.title }}
+                </a>
+            </div>
+            <div class="post-body">{{ todo_list.master.username }}</div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
 {% endblock %}
