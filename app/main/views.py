@@ -2,7 +2,8 @@ from flask import render_template, url_for, redirect, flash
 from flask_login import login_required, current_user
 
 from . import main
-from .forms import AddListForm, AddTaskForm
+from .forms import AddListForm, AddTaskForm, \
+    ChangeToTodoForm, ChangeToDoingForm, ChangeToDoneForm, DeleteTaskForm
 from ..models import User, ToDoList, Task
 from .. import db
 
@@ -31,12 +32,47 @@ def todo_list_details(list_id):
         db.session.add(task)
         return redirect(url_for('.todo_list_details', list_id=list_id))
     if current_user == current_list.master:
-        to_do_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='todo')
+        todo_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='todo')
+        doing_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='doing')
+        done_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='done')
     else:
         flash("You can not view this page.")
         return redirect(url_for('main.index'))
-    return render_template('edit_list.html', title=current_list.title, to_do_tasks=to_do_tasks, form=form)
+    return render_template('edit_list.html', title=current_list.title, form=form,
+                           todo_tasks=todo_tasks, doing_tasks=doing_tasks, done_tasks=done_tasks)
+
+
+@main.route('/task/change_to_todo/<int:task_id>')
+@login_required
+def change_to_todo(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    task.change_into_todo()
+    return redirect(url_for('.todo_list_details', list_id=task.list_id))
+
+
+@main.route('/task/change_to_doing/<int:task_id>')
+@login_required
+def change_to_doing(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    task.change_into_doing()
+    return redirect(url_for('.todo_list_details', list_id=task.list_id))
+
+
+@main.route('/task/change_to_done/<int:task_id>')
+@login_required
+def change_to_done(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    task.change_into_done()
+    return redirect(url_for('.todo_list_details', list_id=task.list_id))
+
+
+@main.route('/task/delete_task/<int:task_id>')
+@login_required
+def delete_task(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    task.delete_task()
+    return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
 
 
-# todo: unfinished
+

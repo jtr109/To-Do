@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import "_list_table_macros.html" as list_table_macros %}
 
 {% block title %}ToDo{% endblock %}
 
@@ -21,17 +22,10 @@
             <th>Done</th>
         </tr>
         <tr>
-            <td>
-                <ul class="posts">
-                    {% for task in to_do_tasks %}
-                        <li>
-                            <div class="post-body">{{ task.body }}</div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </td>
-            <td>doing data</td>
-            <td>done data</td>
+            {{ list_table_macros.list_table_td(todo_tasks ,'todo') }}
+            {{ list_table_macros.list_table_td(doing_tasks ,'doing') }}
+            {{ list_table_macros.list_table_td(done_tasks ,'done') }}
+
         </tr>
     </table>
 </div>

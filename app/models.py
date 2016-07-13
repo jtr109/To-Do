@@ -121,6 +121,28 @@ class Task(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     list_id = db.Column(db.Integer, db.ForeignKey('todo-lists.id'))
 
+    def change_into_todo(self):
+        self.state = 'todo'
+        self.timestamp = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def change_into_doing(self):
+        self.state = 'doing'
+        self.timestamp = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def change_into_done(self):
+        self.state = 'done'
+        self.timestamp = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_task(self):
+        db.session.delete(self)
+        db.session.commit()
+
     def __repr__(self):
         return '<Task %r>' % self.id
 

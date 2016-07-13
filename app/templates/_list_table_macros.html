@@ -1,0 +1,21 @@
+{% macro list_table_td(tasks ,state) %}
+<td>
+    <ul class="posts">
+        {% for task in tasks %}
+            <li>
+                <div class="post-body">{{ task.body }}</div>
+                {% if state != 'todo' %}
+                <div><a href="{{ url_for('main.change_to_todo', task_id=task.id, _external=True) }}">change to todo</a></div>
+                {% endif %}
+                {% if state != 'doing' %}
+                <div><a href="{{ url_for('main.change_to_doing', task_id=task.id, _external=True) }}">change to doing</a></div>
+                {% endif %}
+                {% if state != 'done' %}
+                <div><a href="{{ url_for('main.change_to_done', task_id=task.id, _external=True) }}">change to done</a></div>
+                {% endif %}
+                <div><a href="{{ url_for('main.delete_task', task_id=task.id, _external=True) }}">delete task</a></div>
+            </li>
+        {% endfor %}
+    </ul>
+</td>
+{% endmacro %}

@@ -16,3 +16,19 @@ class AddListForm(Form):
 class AddTaskForm(Form):
     task = StringField('Add task.', validators=[DataRequired()])
     submit = SubmitField('Add')
+
+
+class ChangeToTodoForm(Form):
+    submit = SubmitField('Change to Todo')
+
+
+class ChangeToDoingForm(Form):
+    submit = SubmitField('Change to Doing')
+
+
+class ChangeToDoneForm(Form):
+    submit = SubmitField('Change to Done')
+
+
+class DeleteTaskForm(Form):
+    submit = SubmitField('Delete this task')
