@@ -7,7 +7,7 @@
 {% block page_content %}
 <div class="page-header">
     <h1>
-        {{ title }}
+        {{ current_list.title }}
     </h1>
 </div>
 <div>
@@ -25,9 +25,9 @@
             {{ list_table_macros.list_table_td(todo_tasks ,'todo') }}
             {{ list_table_macros.list_table_td(doing_tasks ,'doing') }}
             {{ list_table_macros.list_table_td(done_tasks ,'done') }}
-
         </tr>
     </table>
 </div>
-
+<br>
+<div><a href="{{ url_for('main.delete_todo_list', list_id=current_list.id, _external=True) }}">Delete this todo list</a></div>
 {% endblock %}

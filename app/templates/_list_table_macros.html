@@ -1,9 +1,9 @@
 {% macro list_table_td(tasks ,state) %}
 <td>
-    <ul class="posts">
+    <ul>
         {% for task in tasks %}
             <li>
-                <div class="post-body">{{ task.body }}</div>
+                <div>{{ task.body }}</div>
                 {% if state != 'todo' %}
                 <div><a href="{{ url_for('main.change_to_todo', task_id=task.id, _external=True) }}">change to todo</a></div>
                 {% endif %}

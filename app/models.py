@@ -108,6 +108,13 @@ class ToDoList(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     master_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     tasks = db.relationship('Task', backref='in_list', lazy='dynamic')
+    events = db.relationship('ListEvent', backref='in_list', lazy='dynamic')
+
+    def delete_todo_list(self):
+        db.session.delete(self)
+        event = ListEvent(event='Delete list "%s".' % self.title)
+        db.session.add(event)
+        db.session.commit()
 
     def __repr__(self):
         return '<ToDoList %r>' % self.id
@@ -122,27 +129,50 @@ class Task(db.Model):
     list_id = db.Column(db.Integer, db.ForeignKey('todo-lists.id'))
 
     def change_into_todo(self):
+        original_state = self.state
         self.state = 'todo'
         self.timestamp = datetime.utcnow()
+        self.generate_switch_event(original_state)
         db.session.add(self)
         db.session.commit()
 
     def change_into_doing(self):
+        original_state = self.state
         self.state = 'doing'
         self.timestamp = datetime.utcnow()
+        self.generate_switch_event(original_state)
         db.session.add(self)
         db.session.commit()
 
     def change_into_done(self):
+        original_state = self.state
         self.state = 'done'
         self.timestamp = datetime.utcnow()
+        self.generate_switch_event(original_state)
         db.session.add(self)
         db.session.commit()
 
     def delete_task(self):
         db.session.delete(self)
+        event = ListEvent(event='Delete task "%s".' % self.body)
+        db.session.add(event)
         db.session.commit()
+
+    def generate_switch_event(self, original_state):
+        event = ListEvent(event='Change "%s" from "%s" to "%s".' % (self.body, original_state, self.state),
+                          list_id=self.list_id)
+        db.session.add(event)
 
     def __repr__(self):
         return '<Task %r>' % self.id
 
+
+class ListEvent(db.Model):
+    __tablename__ = 'list-events'
+    id = db.Column(db.Integer, primary_key=True)
+    event = db.Column(db.String(64))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    list_id = db.Column(db.Integer, db.ForeignKey('todo-lists.id'))
+
+    def __repr__(self):
+        return '<List Event %r>' % self.id
