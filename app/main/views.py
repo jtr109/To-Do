@@ -39,8 +39,10 @@ def todo_list_details(list_id):
     todo_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='todo')
     doing_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='doing')
     done_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='done')
+    list_events = ListEvent.query.order_by(ListEvent.timestamp.desc()).filter_by(list_id=list_id)
     return render_template('edit_list.html', current_list=current_list, form=form,
-                           todo_tasks=todo_tasks, doing_tasks=doing_tasks, done_tasks=done_tasks)
+                           todo_tasks=todo_tasks, doing_tasks=doing_tasks, done_tasks=done_tasks,
+                           list_events=list_events)
 
 
 @main.route('/task/delete_list/<int:list_id>')
