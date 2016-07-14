@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_list_table_macros.html" as list_table_macros %}
+{% import "_macros.html" as macros %}
+
+{% block title %}ToDo{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>
+        {{ current_list.title }}
+    </h1>
+</div>
+<div>
+    {{ wtf.quick_form(form) }}
+</div>
+<br>
+<div>
+    <table border="1">
+        <tr>
+            <th class="todo">To Do</th>
+            <th class="doing">Doing</th>
+            <th class="done">Done</th>
+        </tr>
+        <tr>
+            {{ list_table_macros.list_table_td(todo_tasks ,'todo') }}
+            {{ list_table_macros.list_table_td(doing_tasks ,'doing') }}
+            {{ list_table_macros.list_table_td(done_tasks ,'done') }}
+        </tr>
+    </table>
+</div>
+<br>
+<h2>Events</h2>
+<ul class="posts">
+    {% for event in list_events %}
+    <li class="post">
+        <div class="post-content">
+            <div class="post-date">{{ moment(event.timestamp).fromNow() }}</div>
+            <div class="post-author">{{ event.in_list.master.username }}</div>
+            <div class="post-body">{{ event.event }}</div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'main.todo_list_details', list_id=current_list.id, _external=True) }}
+</div>
+<br>
+<div><a href="{{ url_for('main.delete_todo_list', list_id=current_list.id, _external=True) }}">Delete this todo list</a></div>
+{% endblock %}
