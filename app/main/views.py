@@ -30,7 +30,6 @@ def index():
 def todo_list_details(list_id):
     current_list = ToDoList.query.filter_by(id=list_id).first_or_404()
     if current_user != current_list.master:
-        flash("You can not view this page.")
         abort(403)
     form = AddTaskForm()
     if form.validate_on_submit():

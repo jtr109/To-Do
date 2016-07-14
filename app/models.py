@@ -118,9 +118,9 @@ class ToDoList(db.Model):
 
     @staticmethod
     def on_delete(mapper, connection, target):
-        list_event = ListEvent(event='List "%s" was deleted.' % target.title,
-                               list_id=target.id)
-        db.session.add(list_event)
+        list_events = ListEvent.query.filter_by(list_id=target.id)
+        for e in list_events:
+            db.session.delete(e)
 
     def __repr__(self):
         return '<ToDoList %r>' % self.id
