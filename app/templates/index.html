@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
 
 {% block title %}ToDo{% endblock %}
 
@@ -24,7 +25,7 @@
         <div class="post-content">
             <div class="post-date">{{ moment(todo_list.timestamp).fromNow() }}</div>
             <div class="post-author">
-                <a href="{{ url_for('main.todo_list_details', list_id=todo_list.id) }}">
+                <a href="{{ url_for('main.todo_list_details', list_id=todo_list.id, _external=True) }}">
                     {{ todo_list.title }}
                 </a>
             </div>
@@ -33,4 +34,7 @@
     </li>
     {% endfor %}
 </ul>
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'main.index', _external=True) }}
+</div>
 {% endblock %}

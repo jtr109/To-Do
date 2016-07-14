@@ -1,19 +1,31 @@
 {% macro list_table_td(tasks ,state) %}
 <td>
-    <ul>
+    <ul class="posts">
         {% for task in tasks %}
-            <li>
-                <div>{{ task.body }}</div>
-                {% if state != 'todo' %}
-                <div><a href="{{ url_for('main.change_to_todo', task_id=task.id, _external=True) }}">change to todo</a></div>
-                {% endif %}
-                {% if state != 'doing' %}
-                <div><a href="{{ url_for('main.change_to_doing', task_id=task.id, _external=True) }}">change to doing</a></div>
-                {% endif %}
-                {% if state != 'done' %}
-                <div><a href="{{ url_for('main.change_to_done', task_id=task.id, _external=True) }}">change to done</a></div>
-                {% endif %}
-                <div><a href="{{ url_for('main.delete_task', task_id=task.id, _external=True) }}">delete task</a></div>
+            <li class="post">
+                <div class="post-content">
+                    <div class="post-author">{{ task.body }}</div>
+                    <div class="post-footer">
+                        {% if state != 'todo' %}
+                            <a href="{{ url_for('main.change_to_todo', task_id=task.id, _external=True) }}">
+                                <span class="label label-primary">change to todo</span>
+                            </a>
+                        {% endif %}
+                        {% if state != 'doing' %}
+                            <a href="{{ url_for('main.change_to_doing', task_id=task.id, _external=True) }}">
+                                <span class="label label-primary">change doing</span>
+                            </a>
+                        {% endif %}
+                        {% if state != 'done' %}
+                            <a href="{{ url_for('main.change_to_done', task_id=task.id, _external=True) }}">
+                                <span class="label label-primary">change to done</span>
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('main.delete_task', task_id=task.id, _external=True) }}">
+                            <span class="label label-primary">delete task</span>
+                        </a>
+                    </div>
+                </div>
             </li>
         {% endfor %}
     </ul>

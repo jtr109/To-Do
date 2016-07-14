@@ -31,3 +31,42 @@ div.post-content {
     margin-left: 48px;
     min-height: 48px;
 }
+
+table
+  {
+  font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+  width:100%;
+  border-collapse:collapse;
+  }
+
+table th
+  {
+  border:2px solid #98bf21;
+  padding:6px 14px 4px 14px;
+  font-size:1.6em;
+  text-align:left;
+  padding-top:10px;
+  padding-bottom:8px;
+  background-color:blue;
+  color:#ffffff;
+  }
+
+table th.todo
+  {
+    width: 33%
+  }
+
+table th.doing
+  {
+    width: 33%
+  }
+
+table th.done
+  {
+    width: 33%
+  }
+
+table td
+  {
+  vertical-align: top;
+  }

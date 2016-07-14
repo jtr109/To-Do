@@ -1,5 +1,5 @@
-from flask import render_template, url_for, redirect, flash
-from flask_login import login_required, current_user
+from flask import render_template, url_for, redirect, flash, request
+from flask_login import login_required, current_user, current_app
 
 from . import main
 from .forms import AddListForm, AddTaskForm
@@ -20,8 +20,12 @@ def index():
                           list_id=todo_list.id)
         db.session.add(event)
         return redirect(url_for('.todo_list_details', list_id=todo_list.id))
-    todo_lists = ToDoList.query.order_by(ToDoList.timestamp.desc()).filter_by(master=current_user)
-    return render_template('index.html', form=form, todo_lists=todo_lists)
+    page = request.args.get('page', 1, type=int)
+    pagination = ToDoList.query.order_by(ToDoList.timestamp.desc()).filter_by(master=current_user).paginate(
+        page, per_page=current_app.config['TODO_POSTS_PER_PAGE'], error_out=False)
+    todo_lists = pagination.items
+    return render_template('index.html', form=form,
+                           pagination=pagination, todo_lists=todo_lists)
 
 
 @main.route('/list/<int:list_id>', methods=['GET', 'POST'])
@@ -43,10 +47,13 @@ def todo_list_details(list_id):
     todo_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='todo')
     doing_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='doing')
     done_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='done')
-    list_events = ListEvent.query.order_by(ListEvent.timestamp.desc()).filter_by(list_id=list_id)
+    page = request.args.get('page', 1, type=int)
+    pagination = ListEvent.query.order_by(ListEvent.timestamp.desc()).filter_by(list_id=list_id).paginate(
+        page, per_page=current_app.config['TODO_POSTS_PER_PAGE'], error_out=False)
+    list_events = pagination.items
     return render_template('edit_list.html', current_list=current_list, form=form,
                            todo_tasks=todo_tasks, doing_tasks=doing_tasks, done_tasks=done_tasks,
-                           list_events=list_events)
+                           pagination=pagination, list_events=list_events)
 
 
 @main.route('/task/delete_list/<int:list_id>')

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_list_table_macros.html" as list_table_macros %}
+{% import "_macros.html" as macros %}
 
 {% block title %}ToDo{% endblock %}
 
@@ -17,9 +18,9 @@
 <div>
     <table border="1">
         <tr>
-            <th>To Do</th>
-            <th>Doing</th>
-            <th>Done</th>
+            <th class="todo">To Do</th>
+            <th class="doing">Doing</th>
+            <th class="done">Done</th>
         </tr>
         <tr>
             {{ list_table_macros.list_table_td(todo_tasks ,'todo') }}
@@ -29,6 +30,7 @@
     </table>
 </div>
 <br>
+<h2>Events</h2>
 <ul class="posts">
     {% for event in list_events %}
     <li class="post">
@@ -40,7 +42,9 @@
     </li>
     {% endfor %}
 </ul>
-
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'main.todo_list_details', list_id=current_list.id, _external=True) }}
+</div>
 <br>
 <div><a href="{{ url_for('main.delete_todo_list', list_id=current_list.id, _external=True) }}">Delete this todo list</a></div>
 {% endblock %}
