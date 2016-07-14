@@ -16,9 +16,6 @@ def index():
                              master=current_user._get_current_object())
         db.session.add(todo_list)
         db.session.commit()
-        event = ListEvent(event='Creat list: "%s".' % form.title.data,
-                          list_id=todo_list.id)
-        db.session.add(event)
         return redirect(url_for('.todo_list_details', list_id=todo_list.id))
     page = request.args.get('page', 1, type=int)
     pagination = ToDoList.query.order_by(ToDoList.timestamp.desc()).filter_by(master=current_user).paginate(
@@ -39,9 +36,6 @@ def todo_list_details(list_id):
     if form.validate_on_submit():
         task = Task(body=form.task.data,
                     list_id=list_id)
-        event = ListEvent(event='Create task: "%s".' % form.task.data,
-                          list_id=list_id)
-        db.session.add(event)
         db.session.add(task)
         return redirect(url_for('.todo_list_details', list_id=list_id))
     todo_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='todo')
@@ -60,7 +54,7 @@ def todo_list_details(list_id):
 @login_required
 def delete_todo_list(list_id):
     todo_list = ToDoList.query.filter_by(id=list_id).first()
-    todo_list.delete_todo_list()
+    db.session.delete(todo_list)
     return redirect(url_for('.index', list_id=todo_list.id))
 
 
@@ -68,7 +62,7 @@ def delete_todo_list(list_id):
 @login_required
 def change_to_todo(task_id):
     task = Task.query.filter_by(id=task_id).first()
-    task.change_into_todo()
+    task.state = 'todo'
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
 
@@ -76,7 +70,7 @@ def change_to_todo(task_id):
 @login_required
 def change_to_doing(task_id):
     task = Task.query.filter_by(id=task_id).first()
-    task.change_into_doing()
+    task.state = 'doing'
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
 
@@ -84,7 +78,7 @@ def change_to_doing(task_id):
 @login_required
 def change_to_done(task_id):
     task = Task.query.filter_by(id=task_id).first()
-    task.change_into_done()
+    task.state = 'done'
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
 
@@ -92,7 +86,7 @@ def change_to_done(task_id):
 @login_required
 def delete_task(task_id):
     task = Task.query.filter_by(id=task_id).first()
-    task.delete_task()
+    db.session.delete(task)
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
 

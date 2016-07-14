@@ -110,14 +110,24 @@ class ToDoList(db.Model):
     tasks = db.relationship('Task', backref='in_list', lazy='dynamic')
     events = db.relationship('ListEvent', backref='in_list', lazy='dynamic')
 
-    def delete_todo_list(self):
-        db.session.delete(self)
-        event = ListEvent(event='Delete list "%s".' % self.title)
-        db.session.add(event)
-        db.session.commit()
+    @staticmethod
+    def on_insert(mapper, connection, target):
+        list_event = ListEvent(event='List "%s" was created.' % target.title,
+                               list_id=target.id)
+        db.session.add(list_event)
+
+    @staticmethod
+    def on_delete(mapper, connection, target):
+        list_event = ListEvent(event='List "%s" was deleted.' % target.title,
+                               list_id=target.id)
+        db.session.add(list_event)
 
     def __repr__(self):
         return '<ToDoList %r>' % self.id
+
+db.event.listen(ToDoList, 'after_insert', ToDoList.on_insert)
+db.event.listen(ToDoList, 'before_delete', ToDoList.on_delete)
+
 
 
 class Task(db.Model):
@@ -128,37 +138,31 @@ class Task(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     list_id = db.Column(db.Integer, db.ForeignKey('todo-lists.id'))
 
-    def change_into_todo(self):
-        original_state = self.state
-        self.state = 'todo'
-        self.timestamp = datetime.utcnow()
-        self.generate_switch_event(original_state)
+    @staticmethod
+    def on_changed_state(target, value, oldvalue, initiator):
+        target.timestamp = datetime.utcnow()
+        list_event = ListEvent(event='Task "%s" was changed from "%s" to "%s".' % (target.body, oldvalue, value),
+                               list_id=target.list_id)
+        db.session.add(list_event)
 
-    def change_into_doing(self):
-        original_state = self.state
-        self.state = 'doing'
-        self.timestamp = datetime.utcnow()
-        self.generate_switch_event(original_state)
+    @staticmethod
+    def on_insert(mapper, connection, target):
+        list_event = ListEvent(event='Task "%s" was created.' % target.body,
+                               list_id=target.list_id)
+        db.session.add(list_event)
 
-    def change_into_done(self):
-        original_state = self.state
-        self.state = 'done'
-        self.timestamp = datetime.utcnow()
-        self.generate_switch_event(original_state)
-
-    def delete_task(self):
-        event = ListEvent(event='Delete task "%s".' % self.body,
-                          list_id=self.list_id)
-        db.session.add(event)
-        db.session.delete(self)
-
-    def generate_switch_event(self, original_state):
-        event = ListEvent(event='Change "%s" from "%s" to "%s".' % (self.body, original_state, self.state),
-                          list_id=self.list_id)
-        db.session.add(event)
+    @staticmethod
+    def on_delete(mapper, connection, target):
+        list_event = ListEvent(event='Task "%s" was deleted.' % target.body,
+                               list_id=target.list_id)
+        db.session.add(list_event)
 
     def __repr__(self):
         return '<Task %r>' % self.id
+
+db.event.listen(Task.state, 'set', Task.on_changed_state)
+db.event.listen(Task, 'after_insert', Task.on_insert)
+db.event.listen(Task, 'before_delete', Task.on_delete)
 
 
 class ListEvent(db.Model):
