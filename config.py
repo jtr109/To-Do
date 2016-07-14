@@ -14,6 +14,7 @@ class Config:
     TODO_MAIL_SUBJECT_PREFIX = '[ToDo]'
     TODO_MAIL_SENDER = 'ToDo Admin <357626927@qq.com>'
     TODO_ADMIN = os.environ.get('TODO_ADMIN')
+    TODO_POSTS_PER_PAGE = 10
 
     @staticmethod
     def init_app(app):
