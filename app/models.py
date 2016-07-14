@@ -129,7 +129,6 @@ db.event.listen(ToDoList, 'after_insert', ToDoList.on_insert)
 db.event.listen(ToDoList, 'before_delete', ToDoList.on_delete)
 
 
-
 class Task(db.Model):
     __tablename__ = 'tasks'
     id = db.Column(db.Integer, primary_key=True)

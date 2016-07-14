@@ -1,4 +1,4 @@
-from flask import render_template, url_for, redirect, flash, request
+from flask import render_template, url_for, redirect, flash, request, abort
 from flask_login import login_required, current_user, current_app
 
 from . import main
@@ -28,10 +28,10 @@ def index():
 @main.route('/list/<int:list_id>', methods=['GET', 'POST'])
 @login_required
 def todo_list_details(list_id):
-    current_list = ToDoList.query.filter_by(id=list_id).first()
+    current_list = ToDoList.query.filter_by(id=list_id).first_or_404()
     if current_user != current_list.master:
         flash("You can not view this page.")
-        return redirect(url_for('.index'))
+        abort(403)
     form = AddTaskForm()
     if form.validate_on_submit():
         task = Task(body=form.task.data,
@@ -53,7 +53,9 @@ def todo_list_details(list_id):
 @main.route('/task/delete_list/<int:list_id>')
 @login_required
 def delete_todo_list(list_id):
-    todo_list = ToDoList.query.filter_by(id=list_id).first()
+    todo_list = ToDoList.query.filter_by(id=list_id).first_or_404()
+    if current_user != todo_list.master:
+        abort(403)
     db.session.delete(todo_list)
     return redirect(url_for('.index', list_id=todo_list.id))
 
@@ -61,7 +63,9 @@ def delete_todo_list(list_id):
 @main.route('/task/change_to_todo/<int:task_id>')
 @login_required
 def change_to_todo(task_id):
-    task = Task.query.filter_by(id=task_id).first()
+    task = Task.query.filter_by(id=task_id).first_or_404()
+    if current_user != task.in_list.master:
+        abort(403)
     task.state = 'todo'
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
@@ -69,7 +73,9 @@ def change_to_todo(task_id):
 @main.route('/task/change_to_doing/<int:task_id>')
 @login_required
 def change_to_doing(task_id):
-    task = Task.query.filter_by(id=task_id).first()
+    task = Task.query.filter_by(id=task_id).first_or_404()
+    if current_user != task.in_list.master:
+        abort(403)
     task.state = 'doing'
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
@@ -77,7 +83,9 @@ def change_to_doing(task_id):
 @main.route('/task/change_to_done/<int:task_id>')
 @login_required
 def change_to_done(task_id):
-    task = Task.query.filter_by(id=task_id).first()
+    task = Task.query.filter_by(id=task_id).first_or_404()
+    if current_user != task.in_list.master:
+        abort(403)
     task.state = 'done'
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
@@ -85,7 +93,9 @@ def change_to_done(task_id):
 @main.route('/task/delete_task/<int:task_id>')
 @login_required
 def delete_task(task_id):
-    task = Task.query.filter_by(id=task_id).first()
+    task = Task.query.filter_by(id=task_id).first_or_404()
+    if current_user != task.in_list.master:
+        abort(403)
     db.session.delete(task)
     return redirect(url_for('.todo_list_details', list_id=task.list_id))
 
