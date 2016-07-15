@@ -47,23 +47,25 @@ table th
   text-align:left;
   padding-top:10px;
   padding-bottom:8px;
-  background-color:blue;
   color:#ffffff;
   }
 
 table th.todo
   {
-    width: 33%
+    width: 33%;
+    background-color:greenyellow;
   }
 
 table th.doing
   {
-    width: 33%
+    width: 33%;
+    background-color:green;
   }
 
 table th.done
   {
-    width: 33%
+    width: 33%;
+    background-color: darkgreen;
   }
 
 table td
