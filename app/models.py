@@ -1,11 +1,12 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+from flask import current_app, url_for
 from datetime import datetime
 
 from . import db
 from . import login_manager
+from .exceptions import ValidationError
 
 
 class Role(db.Model):
@@ -92,6 +93,28 @@ class User(UserMixin, db.Model):
         db.session.add(self)
         return True
 
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config['SECRET_KEY'],
+                       expires_in=expiration)
+        return s.dumps({'id': self.id}).decode('ascii')
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data['id'])
+
+    def to_json(self):
+        json_user = {
+            'url': url_for('api.get_user', id=self.id, _external=True),  # todo
+            'username': self.username,
+            'todo_lists': url_for('api.get_todo_lists', id=self.id, _external=True),
+        }
+        return json_user
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -122,6 +145,24 @@ class ToDoList(db.Model):
         for e in list_events:
             db.session.delete(e)
 
+    def to_json(self):
+        json_todo_list = {
+            'url': url_for('api.get_todo_list', id=self.id, _external=True),
+            'title': self.title,
+            'timestamp': self.timestamp,
+            'master': url_for('api.get_user', id=self.master_id, _external=True),  # todo
+            'tasks': url_for('api.get_todo_list_tasks', id=self.id, _external=True),
+            'events': url_for('api.get_todo_list_events', id=self.id, _external=True),  # todo
+        }
+        return json_todo_list
+
+    @staticmethod
+    def from_json(json_todo_list):
+        title = json_todo_list.get('title')
+        if title is None or title == '':
+            raise ValidationError('todo list does not have a title')
+        return ToDoList(title=title)
+
     def __repr__(self):
         return '<ToDoList %r>' % self.id
 
@@ -132,7 +173,7 @@ db.event.listen(ToDoList, 'before_delete', ToDoList.on_delete)
 class Task(db.Model):
     __tablename__ = 'tasks'
     id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(64))  # todo: Is 'db.String' enough?
+    body = db.Column(db.String(64))
     state = db.Column(db.String(64), default='todo')
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     list_id = db.Column(db.Integer, db.ForeignKey('todo-lists.id'))
@@ -156,6 +197,22 @@ class Task(db.Model):
                                list_id=target.list_id)
         db.session.add(list_event)
 
+    def to_json(self):
+        json_task = {
+            'body': url_for('get_task', id=self.id, _external=True),
+            'state': self.state,
+            'timestamp': self.timestamp,
+            'todo_list': url_for('api.get_todo_list', id=self.list_id, _external=True),
+        }
+        return json_task
+
+    @staticmethod
+    def from_json(json_todo_list):
+        body = json_todo_list.get('body')
+        if body is None or body == '':
+            raise ValidationError('todo list does not have a title')
+        return ToDoList(body=body)
+
     def __repr__(self):
         return '<Task %r>' % self.id
 
@@ -170,6 +227,14 @@ class ListEvent(db.Model):
     event = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     list_id = db.Column(db.Integer, db.ForeignKey('todo-lists.id'))
+
+    def to_json(self):
+        json_list_event = {
+            'event': url_for('api.get_list_event', id=self.id, _external=True),  # todo
+            'timestamp': self.timestamp,
+            'todo_list': url_for('api.get_todo_list', id=self.list_id, _external=True),
+        }
+        return json_list_event
 
     def __repr__(self):
         return '<List Event %r>' % self.id
