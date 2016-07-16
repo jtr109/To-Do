@@ -109,9 +109,9 @@ class User(UserMixin, db.Model):
 
     def to_json(self):
         json_user = {
-            'url': url_for('api.get_user', id=self.id, _external=True),  # todo
+            'url': url_for('api.get_user', user_id=self.id, _external=True),  # todo
             'username': self.username,
-            'todo_lists': url_for('api.get_todo_lists', id=self.id, _external=True),
+            'todo_lists': url_for('api.get_todo_lists', _external=True),
         }
         return json_user
 
@@ -147,12 +147,12 @@ class ToDoList(db.Model):
 
     def to_json(self):
         json_todo_list = {
-            'url': url_for('api.get_todo_list', id=self.id, _external=True),
+            'url': url_for('api.get_todo_list', list_id=self.id, _external=True),
             'title': self.title,
             'timestamp': self.timestamp,
-            'master': url_for('api.get_user', id=self.master_id, _external=True),  # todo
-            'tasks': url_for('api.get_todo_list_tasks', id=self.id, _external=True),
-            'events': url_for('api.get_todo_list_events', id=self.id, _external=True),  # todo
+            'master': url_for('api.get_user', user_id=self.master_id, _external=True),
+            'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
+            'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
         }
         return json_todo_list
 
@@ -199,10 +199,11 @@ class Task(db.Model):
 
     def to_json(self):
         json_task = {
-            'body': url_for('get_task', id=self.id, _external=True),
+            'url': url_for('api.get_task', task_id=self.id, _external=True),
+            'body': self.body,
             'state': self.state,
             'timestamp': self.timestamp,
-            'todo_list': url_for('api.get_todo_list', id=self.list_id, _external=True),
+            'todo_list': url_for('api.get_todo_list', list_id=self.list_id, _external=True),
         }
         return json_task
 
@@ -230,9 +231,10 @@ class ListEvent(db.Model):
 
     def to_json(self):
         json_list_event = {
-            'event': url_for('api.get_list_event', id=self.id, _external=True),  # todo
+            'url': url_for('api.get_event', event_id=self.id, _external=True),
+            'event': self.event,
             'timestamp': self.timestamp,
-            'todo_list': url_for('api.get_todo_list', id=self.list_id, _external=True),
+            'todo_list': url_for('api.get_todo_list', list_id=self.list_id, _external=True),
         }
         return json_list_event
 

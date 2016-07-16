@@ -6,6 +6,12 @@ from . import api
 from .errors import bad_request
 
 
+@api.route('/tasks/<int:task_id>')
+def get_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    return jsonify(task.to_json())
+
+
 @api.route('/todo_lists/<int:list_id>/tasks/')
 def get_todo_list_tasks(list_id):
     todo_tasks = Task.query.filter_by(list_id=list_id, state='todo')
@@ -49,7 +55,7 @@ def delete_task(list_id, id):
     task = Task.query.filter_by(id=id)
     if todo_list.master != g.current_user or task.in_list != todo_list:
         return bad_request('Task not exist.')
-    state = request.get('state', task.state)
+    state = request.json.get('state', task.state)
     if state not in ['todo', 'doing', 'done']:
         return bad_request('Invalid state')
     db.session.delete(task)
