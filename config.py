@@ -15,7 +15,7 @@ class Config:
     TODO_MAIL_SENDER = 'ToDo Admin <357626927@qq.com>'
     TODO_ADMIN = os.environ.get('TODO_ADMIN')
     TODO_POSTS_PER_PAGE = 10
-    SSL_DISABLE = True
+    SSL_DISABLE = False
 
     @staticmethod
     def init_app(app):
@@ -63,6 +63,7 @@ class ProductionConfig(Config):
 
 
 class HerokuConfig(ProductionConfig):
+    SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
 
     @classmethod
     def init_app(cls, app):
@@ -78,11 +79,6 @@ class HerokuConfig(ProductionConfig):
         file_handler = StreamHandler()
         file_handler.setLevel(logging.WARNING)
         app.logger.addHandler(file_handler)
-
-        from werkzeug.contrib.fixers import ProxyFix
-        app.wsgi_app = ProxyFix(app.wsgi_app)
-
-    SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
 
 
 config = {
