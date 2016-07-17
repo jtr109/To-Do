@@ -63,7 +63,6 @@ class ProductionConfig(Config):
 
 
 class HerokuConfig(ProductionConfig):
-    SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
 
     @classmethod
     def init_app(cls, app):
@@ -80,16 +79,17 @@ class HerokuConfig(ProductionConfig):
         file_handler.setLevel(logging.WARNING)
         app.logger.addHandler(file_handler)
 
-        SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
-
         from werkzeug.contrib.fixers import ProxyFix
         app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
 
 
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
+    'heroku': HerokuConfig,
 
     'default': DevelopmentConfig
 }
