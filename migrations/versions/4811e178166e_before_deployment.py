@@ -1,13 +1,13 @@
-"""update event
+"""before deployment
 
-Revision ID: e12aef14bf5f
+Revision ID: 4811e178166e
 Revises: None
-Create Date: 2016-07-14 08:00:52.051273
+Create Date: 2016-07-17 10:21:28.896286
 
 """
 
 # revision identifiers, used by Alembic.
-revision = 'e12aef14bf5f'
+revision = '4811e178166e'
 down_revision = None
 
 from alembic import op
