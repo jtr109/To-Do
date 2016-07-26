@@ -15,28 +15,32 @@
                 <ul class="list-unstyled">
                     {% for task in tasks[task_state] %}
                         <li>
-                            <div class="list-group-item">
-                                <div>
+                            <div class="list-group-item task">
+                                <div class="task-body">
                                     <h4>{{ task.body }}</h4>
                                 </div>
-                                <div>
+                                <div class="task-options">
                                     {% if task_state != 'todo' %}
-                                        <a href="{{ url_for('main.change_to_todo', task_id=task.id, _external=True) }}">
-                                            <span class="label label-primary">change to todo</span>
+                                        <a href="{{ url_for('main.change_to_todo', task_id=task.id, _external=True) }}"
+                                           class="btn btn-primary btn-xs" role="button">
+                                            change todo
                                         </a>
                                     {% endif %}
                                     {% if task_state != 'doing' %}
-                                        <a href="{{ url_for('main.change_to_doing', task_id=task.id, _external=True) }}">
-                                            <span class="label label-primary">change doing</span>
+                                        <a href="{{ url_for('main.change_to_doing', task_id=task.id, _external=True) }}"
+                                            class="btn btn-primary btn-xs" role="button">
+                                            change doing
                                         </a>
                                     {% endif %}
                                     {% if task_state != 'done' %}
-                                        <a href="{{ url_for('main.change_to_done', task_id=task.id, _external=True) }}">
-                                            <span class="label label-primary">change to done</span>
+                                        <a href="{{ url_for('main.change_to_done', task_id=task.id, _external=True) }}"
+                                            class="btn btn-primary btn-xs" role="button">
+                                            change to done
                                         </a>
                                     {% endif %}
-                                    <a href="{{ url_for('main.delete_task', task_id=task.id, _external=True) }}">
-                                        <span class="label label-danger">delete task</span>
+                                    <a href="{{ url_for('main.delete_task', task_id=task.id, _external=True) }}"
+                                        class="btn btn-danger btn-xs" role="button">
+                                        delete task
                                     </a>
                                 </div>
                             </div>
