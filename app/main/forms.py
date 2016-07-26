@@ -1,6 +1,6 @@
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 
 
 class NameForm(Form):
@@ -14,7 +14,7 @@ class AddListForm(Form):
 
 
 class AddTaskForm(Form):
-    task = StringField('Add task.', validators=[DataRequired()])
+    task = StringField('Add task.', validators=[DataRequired(), Length(1, 32)])
     submit = SubmitField('Add')
 
 

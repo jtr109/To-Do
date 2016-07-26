@@ -32,43 +32,33 @@ div.post-content {
     min-height: 48px;
 }
 
-table
-  {
-  font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
-  width:100%;
-  border-collapse:collapse;
-  }
 
-table th
+div.task-title
   {
-  border:2px solid #98bf21;
-  padding:6px 14px 4px 14px;
   font-size:1.6em;
   text-align:left;
-  padding-top:10px;
-  padding-bottom:8px;
   color:#ffffff;
   }
 
-table th.todo
+div.tasks-table
+{
+    font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+    width:100%;
+    border-collapse:collapse;
+}
+
+div.task-title-bg:nth-child(1)>div.task-title
   {
-    width: 33%;
     background-color:greenyellow;
   }
 
-table th.doing
+div.task-title-bg:nth-child(2)>div.task-title
   {
-    width: 33%;
     background-color:green;
   }
 
-table th.done
+div.task-title-bg:nth-child(3)>div.task-title
   {
-    width: 33%;
     background-color: darkgreen;
   }
 
-table td
-  {
-  vertical-align: top;
-  }
