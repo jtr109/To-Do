@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% import "_list_table_macros.html" as list_table_macros %}
+{% import "_list_grid_macros.html" as list_grid_macros %}
 {% import "_macros.html" as macros %}
 
 {% block title %}ToDo{% endblock %}
@@ -15,20 +15,7 @@
     {{ wtf.quick_form(form) }}
 </div>
 <br>
-<div>
-    <table border="1">
-        <tr>
-            <th class="todo">To Do</th>
-            <th class="doing">Doing</th>
-            <th class="done">Done</th>
-        </tr>
-        <tr>
-            {{ list_table_macros.list_table_td(todo_tasks ,'todo') }}
-            {{ list_table_macros.list_table_td(doing_tasks ,'doing') }}
-            {{ list_table_macros.list_table_td(done_tasks ,'done') }}
-        </tr>
-    </table>
-</div>
+{{ list_grid_macros.list_grid_td(tasks, state_list) }}
 <br>
 <h2>Events</h2>
 <ul class="posts">
