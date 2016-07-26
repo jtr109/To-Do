@@ -40,13 +40,19 @@ def todo_list_details(list_id):
     todo_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='todo')
     doing_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='doing')
     done_tasks = Task.query.order_by(Task.timestamp.desc()).filter_by(list_id=list_id, state='done')
+    tasks = {
+        'todo': todo_tasks,
+        'doing': doing_tasks,
+        'done': done_tasks,
+    }
+    state_list = ['todo', 'doing', 'done']
     page = request.args.get('page', 1, type=int)
     pagination = ListEvent.query.order_by(ListEvent.timestamp.desc()).filter_by(list_id=list_id).paginate(
         page, per_page=current_app.config['TODO_POSTS_PER_PAGE'], error_out=False)
     list_events = pagination.items
-    return render_template('edit_list.html', current_list=current_list, form=form,
-                           todo_tasks=todo_tasks, doing_tasks=doing_tasks, done_tasks=done_tasks,
-                           pagination=pagination, list_events=list_events)
+    return render_template('edit_list.html',
+                           current_list=current_list, form=form, state_list=state_list,
+                           tasks=tasks, pagination=pagination, list_events=list_events)
 
 
 @main.route('/task/delete_list/<int:list_id>')
