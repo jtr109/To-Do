@@ -22,24 +22,24 @@
                                 <div class="task-options">
                                     {% if task_state != 'todo' %}
                                         <a href="{{ url_for('main.change_to_todo', task_id=task.id, _external=True) }}"
-                                           class="btn btn-primary btn-xs" role="button">
+                                           class="btn btn-primary btn-xs state-change" role="button">
                                             change todo
                                         </a>
                                     {% endif %}
                                     {% if task_state != 'doing' %}
                                         <a href="{{ url_for('main.change_to_doing', task_id=task.id, _external=True) }}"
-                                            class="btn btn-primary btn-xs" role="button">
+                                            class="btn btn-primary btn-xs state-change" role="button">
                                             change doing
                                         </a>
                                     {% endif %}
                                     {% if task_state != 'done' %}
                                         <a href="{{ url_for('main.change_to_done', task_id=task.id, _external=True) }}"
-                                            class="btn btn-primary btn-xs" role="button">
+                                            class="btn btn-primary btn-xs state-change" role="button">
                                             change to done
                                         </a>
                                     {% endif %}
                                     <a href="{{ url_for('main.delete_task', task_id=task.id, _external=True) }}"
-                                        class="btn btn-danger btn-xs" role="button">
+                                        class="btn btn-danger btn-xs state-change" role="button">
                                         delete task
                                     </a>
                                 </div>
