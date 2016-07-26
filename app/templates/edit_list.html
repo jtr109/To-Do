@@ -33,5 +33,11 @@
     {{ macros.pagination_widget(pagination, 'main.todo_list_details', list_id=current_list.id, _external=True) }}
 </div>
 <br>
-<div><a href="{{ url_for('main.delete_todo_list', list_id=current_list.id, _external=True) }}">Delete this todo list</a></div>
+<div>
+    <a href="{{ url_for('main.delete_todo_list', list_id=current_list.id, _external=True) }}"
+        class="btn btn-danger">
+    Delete this todo list
+    </a>
+</div>
+<br />
 {% endblock %}
