@@ -9,11 +9,36 @@ from . import login_manager
 from .exceptions import ValidationError
 
 
+class Permission:
+    NORMAL = 0x01
+    MODERATE_LIST = 0x10
+    REMOVE_LIST = 0x20
+    ADMINISTER = 0x80
+
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)
+    permissions = db.Column(db.Integer)
     users = db.relationship('User', backref='role', lazy='dynamic')
+
+    @staticmethod
+    def insert_roles():
+        roles = {
+            'User': (Permission.NORMAL,
+                     True),
+            'Administrator': (0xff, False),
+        }
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            role.permissions = role[r][0]
+            role.default = role[r][1]
+            db.session.add(role)
+        db.session.commit()
 
     def __repr__(self):
         return '<Role %r>' % self.name
