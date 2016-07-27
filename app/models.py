@@ -1,5 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, url_for
 from datetime import datetime
@@ -35,8 +35,8 @@ class Role(db.Model):
             role = Role.query.filter_by(name=r).first()
             if role is None:
                 role = Role(name=r)
-            role.permissions = role[r][0]
-            role.default = role[r][1]
+            role.permissions = roles[r][0]
+            role.default = roles[r][1]
             db.session.add(role)
         db.session.commit()
 
@@ -53,6 +53,14 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     todo_lists = db.relationship('ToDoList', backref='master', lazy='dynamic')
+
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.role is None:
+            if self.email == current_app.config['TODO_ADMIN']:
+                self.role = Role.query.filter_by(permission=0xff).first()
+            if self.role is None:
+                self.role = Role.query.filter_by(default=True).first()
 
     @property
     def password(self):
@@ -132,6 +140,13 @@ class User(UserMixin, db.Model):
             return None
         return User.query.get(data['id'])
 
+    def can(self, permissions):
+        return self.role is not None and \
+               (self.role.permissions & permissions) == permissions
+
+    def is_administrator(self):
+        return self.can(Permission.ADMINISTER)
+
     def to_json(self):
         json_user = {
             'url': url_for('api.get_user', user_id=self.id, _external=True),
@@ -142,6 +157,16 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+class AnonymousUser(AnonymousUserMixin):
+    def can(self, permissions):
+        return False
+
+    def is_administrator(self):
+        return False
+
+login_manager.anonymous_user = AnonymousUser
 
 
 @login_manager.user_loader
