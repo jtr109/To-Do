@@ -58,7 +58,7 @@ class User(UserMixin, db.Model):
         super(User, self).__init__(**kwargs)
         if self.role is None:
             if self.email == current_app.config['TODO_ADMIN']:
-                self.role = Role.query.filter_by(permission=0xff).first()
+                self.role = Role.query.filter_by(permissions=0xff).first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
 
