@@ -32,8 +32,11 @@ def test():
 def deploy():
     """Run deployment tasks."""
     from flask_migrate import upgrade
+    from app.models import Role
 
     upgrade()
+
+    Role.insert_roles()
 
 
 if __name__ == '__main__':
