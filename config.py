@@ -12,7 +12,7 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     TODO_MAIL_SUBJECT_PREFIX = '[ToDo]'
-    TODO_MAIL_SENDER = 'ToDo Admin <357626927@qq.com>'
+    TODO_MAIL_SENDER = 'ToDo Server <' + MAIL_USERNAME + '>'
     TODO_ADMIN = os.environ.get('TODO_ADMIN')
     TODO_POSTS_PER_PAGE = 10
     SSL_DISABLE = False
