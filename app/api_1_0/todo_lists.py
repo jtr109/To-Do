@@ -39,7 +39,7 @@ def create_todo_list():
     db.session.add(todo_list)
     db.session.commit()
     return jsonify(todo_list.to_json()), 201, \
-           {'Location': url_for('api.get_todo_list', id=todo_list.id, _external=True)}
+           {'Location': url_for('api.get_todo_list', list_id=todo_list.id, _external=True)}
 
 
 @api.route('/todo_lists/<int:list_id>', methods=['DELETE'])

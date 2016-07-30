@@ -6,12 +6,6 @@ from . import api
 from .errors import bad_request
 
 
-@api.route('/tasks/<int:task_id>')
-def get_task(task_id):
-    task = Task.query.get_or_404(task_id)
-    return jsonify(task.to_json())
-
-
 @api.route('/todo_lists/<int:list_id>/tasks/')
 def get_todo_list_tasks(list_id):
     todo_tasks = Task.query.filter_by(list_id=list_id, state='todo')
@@ -31,32 +25,37 @@ def new_tasks(list_id):
     db.session.add(task)
     db.session.commit()
     return jsonify(task.to_json()), 201, \
-        {'Location': url_for('api.get_todo_list', id=list_id, _external=True)}
+        {'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)}
 
 
-@api.route('/todo_lists/<int:list_id>/tasks/<int:task_id>', methods=['PUT'])
-def change_state_of_task(list_id, task_id):
-    todo_list = ToDoList.query.get_or_404(id=list_id)
-    task = Task.query.filter_by(id=task_id)
+@api.route('/tasks/<int:task_id>')
+def get_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    return jsonify(task.to_json())
+
+
+@api.route('/tasks/<int:task_id>', methods=['PUT'])
+def change_state_of_task(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    todo_list = task.in_list
+    list_id = todo_list.id
     if todo_list.master != g.current_user or task.in_list != todo_list:
-        return bad_request('Task not exist.')
+        return bad_request('Invalid list.')
     state = request.json.get('state', task.state)
     if state not in ['todo', 'doing', 'done']:
         return bad_request('Invalid state')
     task.state = state
     db.session.add(task)
     return jsonify(task.to_json()), 201, \
-        {'Location': url_for('api.get_todo_list', id=list_id, _external=True)}
+        {'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)}
 
 
-@api.route('/todo_lists/<int:list_id>/tasks/<int:id>', methods=['DELETE'])
-def delete_task(list_id, id):
-    todo_list = ToDoList.query.get_or_404(id=list_id)
-    task = Task.query.filter_by(id=id)
+@api.route('/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    todo_list = task.in_list
+    list_id = todo_list.id
     if todo_list.master != g.current_user or task.in_list != todo_list:
-        return bad_request('Task not exist.')
-    state = request.json.get('state', task.state)
-    if state not in ['todo', 'doing', 'done']:
-        return bad_request('Invalid state')
+        return bad_request('Invalid list.')
     db.session.delete(task)
-    return jsonify({'Location': url_for('api.get_todo_list', id=list_id, _external=True)})
+    return jsonify({'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)})

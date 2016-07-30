@@ -262,7 +262,7 @@ class Task(db.Model):
         body = json_todo_list.get('body')
         if body is None or body == '':
             raise ValidationError('todo list does not have a title')
-        return ToDoList(body=body)
+        return Task(body=body)
 
     def __repr__(self):
         return '<Task %r>' % self.id
