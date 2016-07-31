@@ -130,7 +130,7 @@ param.password       | The password or None if token is used | header         | 
 
 Create a new todo list
 
-#### Response Class (Status 200)
+#### Response Class (Status 201)
 
 OK
 
@@ -192,7 +192,7 @@ param.password       |            | The password or None if token is used | head
 
 Delete a todo list
 
-#### Response Class (Status 200)
+#### Response Class (Status 303)
 
 OK
 
@@ -219,7 +219,7 @@ param.password       |            | The password or None if token is used | head
 
 Add new task into the todo list
 
-#### Response Class (Status 200)
+#### Response Class (Status 201)
 
 OK
 
@@ -325,7 +325,7 @@ param.password       | The password or None if token is used | header         | 
 
 Change state of the task
 
-#### Response Class (Status 200)
+#### Response Class (Status 202)
 
 OK
 
@@ -349,3 +349,25 @@ param.email_or_token | The email or token of user            | header         | 
 param.password       | The password or None if token is used | header         | string
 param.state          | The new state of the task             | query          | string
 
+### `DELETE` /api/v1.0/tasks/{int:task_id}
+
+#### Implementation Notes
+
+delete the task
+
+#### Response Class (Status 303)
+
+OK
+
+Model | Model schema
+
+null
+
+Response Content Type: json
+
+#### Parameters
+
+Parameter            | Desciption                            | Parameter Type | Data Type
+:--------------------|:--------------------------------------|:---------------|:--------------
+param.email_or_token | The email or token of user            | header         | string
+param.password       | The password or None if token is used | header         | string

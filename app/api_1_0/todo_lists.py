@@ -46,4 +46,5 @@ def get_todo_list(list_id):
 def delete_todo_list(list_id):
     todo_list = ToDoList.query.get_or_404(list_id)
     db.session.delete(todo_list)
-    return jsonify({'Location': url_for('api.get_todo_lists', _external=True)})
+    return jsonify(None), 303, \
+           {'Location': url_for('api.get_todo_lists', _external=True)}

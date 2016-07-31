@@ -46,7 +46,7 @@ def change_state_of_task(task_id):
         return bad_request('Invalid state')
     task.state = state
     db.session.add(task)
-    return jsonify(task.to_json()), 201, \
+    return jsonify(task.to_json()), 202, \
         {'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)}
 
 
@@ -58,4 +58,5 @@ def delete_task(task_id):
     if todo_list.master != g.current_user or task.in_list != todo_list:
         return bad_request('Invalid list.')
     db.session.delete(task)
-    return jsonify({'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)})
+    return jsonify(None), 303 ,\
+           {'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)}
