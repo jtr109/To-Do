@@ -153,7 +153,7 @@ Parameter            | Value      | Desciption                            | Para
 :--------------------|:-----------|:--------------------------------------|:---------------|:--------------
 param.email_or_token |            | The email or token of user            | header         | string
 param.password       |            | The password or None if token is used | header         | string
-title                | 'new list' | The title of new list                 | query          | string
+param.title          | 'new list' | The title of new list                 | query          | string
 
 ### `GET` /api/v1.0/todo_lists/{int:list_id}
 
@@ -244,7 +244,7 @@ Parameter            | Value      | Desciption                            | Para
 :--------------------|:-----------|:--------------------------------------|:---------------|:--------------
 param.email_or_token |            | The email or token of user            | header         | string
 param.password       |            | The password or None if token is used | header         | string
-body                 | 'new task' | The body of new task                  | query          | string
+param.body           | 'new task' | The body of new task                  | query          | string
 
 
 ### `GET` /api/v1.0/todo_lists/5/tasks/
@@ -318,3 +318,34 @@ Parameter            | Desciption                            | Parameter Type | 
 :--------------------|:--------------------------------------|:---------------|:--------------
 param.email_or_token | The email or token of user            | header         | string
 param.password       | The password or None if token is used | header         | string
+
+### `PATCH` /api/v1.0/tasks/{int:task_id}
+
+#### Implementation Notes
+
+Change state of the task
+
+#### Response Class (Status 200)
+
+OK
+
+Model | Model schema
+
+{
+    "body": "first new test task after fix bug",
+    "state": "doing",
+    "timestamp": "Sun, 31 Jul 2016 12:48:31 GMT",
+    "todo_list": "http://127.0.0.1:5000/api/v1.0/todo_lists/7",
+    "url": "http://127.0.0.1:5000/api/v1.0/tasks/5"
+}
+
+Response Content Type: json
+
+#### Parameters
+
+Parameter            | Desciption                            | Parameter Type | Data Type
+:--------------------|:--------------------------------------|:---------------|:--------------
+param.email_or_token | The email or token of user            | header         | string
+param.password       | The password or None if token is used | header         | string
+param.state          | The new state of the task             | query          | string
+
