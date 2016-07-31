@@ -141,7 +141,7 @@ Model | Model schema
     "master": "http://127.0.0.1:5000/api/v1.0/users/1",
     "tasks": "http://127.0.0.1:5000/api/v1.0/todo_lists/4/tasks/",
     "timestamp": "Sun, 31 Jul 2016 06:17:54 GMT",
-    "title": "new task with json",
+    "title": "new list",
     "url": "http://127.0.0.1:5000/api/v1.0/todo_lists/4"
 }
 
@@ -153,7 +153,7 @@ Parameter            | Value      | Desciption                            | Para
 :--------------------|:-----------|:--------------------------------------|:---------------|:--------------
 param.email_or_token |            | The email or token of user            | header         | string
 param.password       |            | The password or None if token is used | header         | string
-title                | 'new task' | The title of new task                 | query          | string
+title                | 'new list' | The title of new list                 | query          | string
 
 ### `GET` /api/v1.0/todo_lists/{int:list_id}
 
@@ -213,3 +213,108 @@ param.email_or_token |            | The email or token of user            | head
 param.password       |            | The password or None if token is used | header         | string
 
 
+### `POST` /api/v1.0/todo_lists/5/tasks/
+
+#### Implementation Notes
+
+Add new task into the todo list
+
+#### Response Class (Status 200)
+
+OK
+
+Model | Model schema
+
+{
+    "body": "first task",
+    "state": "todo",
+    "timestamp": "Sun, 31 Jul 2016 10:52:41 GMT",
+    "todo_list": "http://127.0.0.1:5000/api/v1.0/todo_lists/5",
+    "url": "http://127.0.0.1:5000/api/v1.0/tasks/2"
+}
+
+
+Response Content Type: json
+
+Response Location: http://127.0.0.1:5000/api/v1.0/todo_lists/5/tasks/
+
+#### Parameters
+
+Parameter            | Value      | Desciption                            | Parameter Type | Data Type
+:--------------------|:-----------|:--------------------------------------|:---------------|:--------------
+param.email_or_token |            | The email or token of user            | header         | string
+param.password       |            | The password or None if token is used | header         | string
+body                 | 'new task' | The body of new task                  | query          | string
+
+
+### `GET` /api/v1.0/todo_lists/5/tasks/
+
+#### Implementation Notes
+
+Show all tasks in the list
+
+#### Response Class (Status 200)
+
+OK
+
+Model | Model schema
+
+{
+    "doing_tasks": [],
+    "done_tasks": [],
+    "todo_tasks": [
+        {
+            "body": "first task",
+            "state": "todo",
+            "timestamp": "Sun, 31 Jul 2016 10:52:41 GMT",
+            "todo_list": "http://127.0.0.1:5000/api/v1.0/todo_lists/5",
+            "url": "http://127.0.0.1:5000/api/v1.0/tasks/2"
+        },
+        {
+            "body": "second task",
+            "state": "todo",
+            "timestamp": "Sun, 31 Jul 2016 11:04:56 GMT",
+            "todo_list": "http://127.0.0.1:5000/api/v1.0/todo_lists/5",
+            "url": "http://127.0.0.1:5000/api/v1.0/tasks/3"
+        }
+    ]
+}
+
+
+Response Content Type: json
+
+#### Parameters
+
+Parameter            | Desciption                            | Parameter Type | Data Type
+:--------------------|:--------------------------------------|:---------------|:--------------
+param.email_or_token | The email or token of user            | header         | string
+param.password       | The password or None if token is used | header         | string
+
+### `GET` /api/v1.0/tasks/{int:task_id}
+
+#### Implementation Notes
+
+Get details of the task
+
+#### Response Class (Status 200)
+
+OK
+
+Model | Model schema
+
+{
+    "body": "first task",
+    "state": "todo",
+    "timestamp": "Sun, 31 Jul 2016 10:52:41 GMT",
+    "todo_list": "http://127.0.0.1:5000/api/v1.0/todo_lists/5",
+    "url": "http://127.0.0.1:5000/api/v1.0/tasks/2"
+}
+
+Response Content Type: json
+
+#### Parameters
+
+Parameter            | Desciption                            | Parameter Type | Data Type
+:--------------------|:--------------------------------------|:---------------|:--------------
+param.email_or_token | The email or token of user            | header         | string
+param.password       | The password or None if token is used | header         | string

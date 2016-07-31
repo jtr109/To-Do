@@ -1,9 +1,19 @@
 from flask import jsonify, request, g, url_for
 
 from .. import db
-from ..models import ToDoList, Task
+from ..models import Task
 from . import api
 from .errors import bad_request
+
+
+@api.route('/todo_lists/<int:list_id>/tasks/', methods=['POST'])
+def new_tasks(list_id):
+    task = Task.from_json(request.json)
+    task.list_id = list_id
+    db.session.add(task)
+    db.session.commit()
+    return jsonify(task.to_json()), 201, \
+           {'Location': url_for('api.get_todo_list_tasks', list_id=list_id, _external=True)}
 
 
 @api.route('/todo_lists/<int:list_id>/tasks/')
@@ -18,23 +28,13 @@ def get_todo_list_tasks(list_id):
     })
 
 
-@api.route('/todo_lists/<int:list_id>/tasks/', methods=['POST'])
-def new_tasks(list_id):
-    task = Task.from_json(request.json)
-    task.list_id = list_id
-    db.session.add(task)
-    db.session.commit()
-    return jsonify(task.to_json()), 201, \
-        {'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)}
-
-
 @api.route('/tasks/<int:task_id>')
 def get_task(task_id):
     task = Task.query.get_or_404(task_id)
     return jsonify(task.to_json())
 
 
-@api.route('/tasks/<int:task_id>', methods=['PUT'])
+@api.route('/tasks/<int:task_id>', methods=['PATCH'])
 def change_state_of_task(task_id):
     task = Task.query.filter_by(id=task_id).first()
     todo_list = task.in_list

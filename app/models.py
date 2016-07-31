@@ -191,6 +191,9 @@ class ToDoList(db.Model):
 
     @staticmethod
     def on_delete(mapper, connection, target):
+        list_tasks = Task.query.filter_by(list_id=target.id)
+        for t in list_tasks:
+            db.session.delete(t)
         list_events = ListEvent.query.filter_by(list_id=target.id)
         for e in list_events:
             db.session.delete(e)
