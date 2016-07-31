@@ -21,3 +21,106 @@ ADMINISTOR                  |0b10000000 (0x80)   |admin web
 用户|0b00000001 (0x01)|创建和编辑list
 协管员|0b00111111 (0x3f)|增加审查和删除他人list的权限
 管理员|0b11111111 (0xff)|所有权限，包括修改其他用户所属权限
+
+
+## API Documents
+
+### `GET` /api/v1.0/token
+
+#### Implementation Notes
+
+get token
+
+#### Response Class (Status 200)
+
+OK
+
+Model | Model schema
+
+    {
+        "expiration": 3600,
+        "token":eyJhbGciOiJIUzI1NiIsImV4cCI6MTQ2OTg3MjY1NywiaWF0IjoxNDY5ODY5MDU3fQ.eyJpZCI6MX0.qDMfoALz│42SVVCulUyedjf2pR1KEgM8i7DZ-QrZqefl3M",
+        "user_id": 1,
+    }
+
+Response Content Type: json
+
+#### Parameters
+
+Parameter      | Desciption        | Parameter Type | Data Type
+:--------------|:------------------|:---------------|:--------------
+param.email    | The email of user | header         | string
+param.password | The password      | header         | string
+
+### `GET` /api/v1.0/users/{user_id}
+
+#### Implementation Notes
+
+Get information about user
+
+#### Response Class (Status 200)
+
+OK
+
+Model | Model schema
+
+    {
+        "todo_lists": "http://127.0.0.1:5000/api/v1.0/todo_lists/",
+        "url": "http://127.0.0.1:5000/api/v1.0/users/1",
+        'username": "user1",
+    }
+
+Response Content Type: json
+
+#### Parameters
+
+Parameter            | Desciption                            | Parameter Type | Data Type
+:--------------------|:--------------------------------------|:---------------|:--------------
+param.email_or_token | The email or token of user            | header         | string
+param.password       | The password or None if token is used | header         | string
+
+
+### `GET` /api/v1.0/todo_lists/
+
+#### Implementation Notes
+
+Get todo_lists of current user
+
+#### Response Class (Status 200)
+
+OK
+
+Model | Model schema
+
+{
+    "count": 2,
+    "next": null,
+    "prev": null,
+    "todo_lists": [
+        {
+            "events": "http://127.0.0.1:5000/api/v1.0/todo_lists/1/events/",
+            "master": "http://127.0.0.1:5000/api/v1.0/users/1",
+            "tasks": "http://127.0.0.1:5000/api/v1.0/todo_lists/1/tasks/",
+            "timestamp": "Fri, 29 Jul 2016 08:03:23 GMT",
+            "title": "First list by api",
+            "url": "http://127.0.0.1:5000/api/v1.0/todo_lists/1"
+        },
+        {
+            "events": "http://127.0.0.1:5000/api/v1.0/todo_lists/3/events/",
+            "master": "http://127.0.0.1:5000/api/v1.0/users/1",
+            "tasks": "http://127.0.0.1:5000/api/v1.0/todo_lists/3/tasks/",
+            "timestamp": "Fri, 29 Jul 2016 08:03:23 GMT",
+            "title": "First list by api",
+            "url": "http://127.0.0.1:5000/api/v1.0/todo_lists/3"
+        },
+    ]
+}
+
+Response Content Type: json
+
+#### Parameters
+
+Parameter            | Desciption                            | Parameter Type | Data Type
+:--------------------|:--------------------------------------|:---------------|:--------------
+param.email_or_token | The email or token of user            | header         | string
+param.password       | The password or None if token is used | header         | string

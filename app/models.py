@@ -147,14 +147,6 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
 
-    def to_json(self):
-        json_user = {
-            'url': url_for('api.get_user', user_id=self.id, _external=True),
-            'username': self.username,
-            'todo_lists': url_for('api.get_todo_lists', _external=True),
-        }
-        return json_user
-
     def __repr__(self):
         return '<User %r>' % self.username
 

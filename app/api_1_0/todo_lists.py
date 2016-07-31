@@ -25,7 +25,7 @@ def get_todo_lists():
     if pagination.has_next:
         next = url_for('api.get_todo_lists', page=page+1, _external=True)
     return jsonify({
-        'todo_lists': [todo_list.to_json() for todo_list in todo_lists],
+        'todo_lists': [t.to_json() for t in todo_lists],
         'prev': prev,
         'next': next,
         'count': pagination.total

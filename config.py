@@ -81,15 +81,6 @@ class HerokuConfig(ProductionConfig):
         app.logger.addHandler(file_handler)
 
 
-class SaeConfig(ProductionConfig):
-    SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
-
-    from sae.const import (MYSQL_HOST, MYSQL_HOST_S, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB)
-
-    SQLALCHEMY_DATABASE_URI = 'mysql://%s:%s@%s:%s/%s' \
-                              % (MYSQL_USER, MYSQL_PASS,
-                                 MYSQL_HOST, MYSQL_PORT, MYSQL_DB)
-
     @classmethod
     def init_app(cls, app):
         ProductionConfig.init_app(app)
@@ -113,7 +104,6 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
     'heroku': HerokuConfig,
-    'sae': SaeConfig,
 
-    'default': DevelopmentConfig
+    'default': DevelopmentConfig,
 }
