@@ -5,12 +5,6 @@ from ..models import ToDoList
 from . import api
 
 
-@api.route('/todo_lists/<int:list_id>')
-def get_todo_list(list_id):
-    todo_list = ToDoList.query.get_or_404(list_id)
-    return jsonify(todo_list.to_json())
-
-
 @api.route('/todo_lists/')
 def get_todo_lists():
     page = request.args.get('page', 1, type=int)
@@ -40,6 +34,12 @@ def create_todo_list():
     db.session.commit()
     return jsonify(todo_list.to_json()), 201, \
            {'Location': url_for('api.get_todo_list', list_id=todo_list.id, _external=True)}
+
+
+@api.route('/todo_lists/<int:list_id>')
+def get_todo_list(list_id):
+    todo_list = ToDoList.query.get_or_404(list_id)
+    return jsonify(todo_list.to_json())
 
 
 @api.route('/todo_lists/<int:list_id>', methods=['DELETE'])
