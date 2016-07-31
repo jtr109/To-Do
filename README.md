@@ -52,7 +52,7 @@ Parameter      | Desciption        | Parameter Type | Data Type
 param.email    | The email of user | header         | string
 param.password | The password      | header         | string
 
-### `GET` /api/v1.0/users/{user_id}
+### `GET` /api/v1.0/users/{int:user_id}
 
 #### Implementation Notes
 
@@ -157,5 +157,36 @@ param.email_or_token |            | The email or token of user            | head
 param.password       |            | The password or None if token is used | header         | string
 title                | 'new task' | The title of new task                 | query          | string
 
+
+### `GET` /api/v1.0/todo_lists/{int:list_id}
+
+#### Implementation Notes
+
+Get infomations about the todo list
+
+#### Response Class (Status 200)
+
+OK
+
+Model | Model schema
+
+{
+    "events": "http://127.0.0.1:5000/api/v1.0/todo_lists/5/events/",
+    "master": "http://127.0.0.1:5000/api/v1.0/users/1",
+    "tasks": "http://127.0.0.1:5000/api/v1.0/todo_lists/5/tasks/",
+    "timestamp": "Sun, 31 Jul 2016 06:29:19 GMT",
+    "title": "new task with json",
+    "url": "http://127.0.0.1:5000/api/v1.0/todo_lists/5"
+}
+
+
+Response Content Type: json
+
+#### Parameters
+
+Parameter            | Value      | Desciption                            | Parameter Type | Data Type
+:--------------------|:-----------|:--------------------------------------|:---------------|:--------------
+param.email_or_token |            | The email or token of user            | header         | string
+param.password       |            | The password or None if token is used | header         | string
 
 
