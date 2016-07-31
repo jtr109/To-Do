@@ -1,4 +1,4 @@
- flask import jsonify
+from flask import jsonify
 
 from ..models import User
 from . import api
