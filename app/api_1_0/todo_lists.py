@@ -5,12 +5,6 @@ from ..models import ToDoList
 from . import api
 
 
-@api.route('/todo_lists/<int:list_id>')
-def get_todo_list(list_id):
-    todo_list = ToDoList.query.get_or_404(list_id)
-    return jsonify(todo_list.to_json())
-
-
 @api.route('/todo_lists/')
 def get_todo_lists():
     page = request.args.get('page', 1, type=int)
@@ -25,7 +19,7 @@ def get_todo_lists():
     if pagination.has_next:
         next = url_for('api.get_todo_lists', page=page+1, _external=True)
     return jsonify({
-        'todo_lists': [todo_list.to_json() for todo_list in todo_lists],
+        'todo_lists': [t.to_json() for t in todo_lists],
         'prev': prev,
         'next': next,
         'count': pagination.total
@@ -39,11 +33,18 @@ def create_todo_list():
     db.session.add(todo_list)
     db.session.commit()
     return jsonify(todo_list.to_json()), 201, \
-           {'Location': url_for('api.get_todo_list', id=todo_list.id, _external=True)}
+           {'Location': url_for('api.get_todo_list', list_id=todo_list.id, _external=True)}
+
+
+@api.route('/todo_lists/<int:list_id>')
+def get_todo_list(list_id):
+    todo_list = ToDoList.query.get_or_404(list_id)
+    return jsonify(todo_list.to_json())
 
 
 @api.route('/todo_lists/<int:list_id>', methods=['DELETE'])
 def delete_todo_list(list_id):
     todo_list = ToDoList.query.get_or_404(list_id)
     db.session.delete(todo_list)
-    return jsonify({'Location': url_for('api.get_todo_lists', _external=True)})
+    return jsonify(None), 303, \
+           {'Location': url_for('api.get_todo_lists', _external=True)}
