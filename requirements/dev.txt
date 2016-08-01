@@ -1,5 +1,4 @@
 -r common.txt
-
 coverage==4.2
 ForgeryPy==0.1
 Pygments==2.1.3
