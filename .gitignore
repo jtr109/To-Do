@@ -3,3 +3,6 @@
 *.sqlite
 .DS_Store
 .env
+venv/
+tmp/
+app/static/Overseas.jpg
