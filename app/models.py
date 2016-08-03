@@ -155,14 +155,17 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
 
+    def upgrade_bind_mode(self):
+        if self.email is not None:
+            self.bind_mode |= BindMode.EMAIL
+        if self.weibo_uid is not None:
+            self.bind_mode |= BindMode.WEIBO
+
     @staticmethod
-    def upgrade_bind_modes():
+    def upgrade_all_bind_modes():
         users = User.query.all()
         for u in users:
-            if u.email is not None:
-                u.bind_mode |= BindMode.EMAIL
-            if u.weibo_uid is not None:
-                u.bind_mode |= BindMode.WEIBO
+            u.upgrade_bind_mode()
             db.session.add(u)
         db.session.commit()
 
