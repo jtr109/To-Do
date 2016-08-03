@@ -15,7 +15,7 @@ class Config:
     TODO_MAIL_SENDER = 'ToDo Server <' + MAIL_USERNAME + '>'
     TODO_ADMIN = os.environ.get('TODO_ADMIN')
     TODO_POSTS_PER_PAGE = 10
-    SSL_DISABLE = False
+    SSL_DISABLE = True
 
     @staticmethod
     def init_app(app):
