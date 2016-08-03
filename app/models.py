@@ -44,6 +44,12 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
 
+class BindMode:
+    EMAIL = 0x01
+    WEIBO = 0x02
+    WEIXIN = 0x04
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -53,6 +59,8 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     todo_lists = db.relationship('ToDoList', backref='master', lazy='dynamic')
+    bind_mode = db.Column(db.Integer, default=0x00)
+    weibo_uid = db.Column(db.String(64), unique=True, index=True)
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -146,6 +154,21 @@ class User(UserMixin, db.Model):
 
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
+
+    def upgrade_bind_mode(self):
+        self.bind_mode = 0  # init bind_mode
+        if self.email is not None:
+            self.bind_mode |= BindMode.EMAIL
+        if self.weibo_uid is not None:
+            self.bind_mode |= BindMode.WEIBO
+
+    @staticmethod
+    def upgrade_all_bind_modes():
+        users = User.query.all()
+        for u in users:
+            u.upgrade_bind_mode()
+            db.session.add(u)
+        db.session.commit()
 
     def to_json(self):
         json_user = {
