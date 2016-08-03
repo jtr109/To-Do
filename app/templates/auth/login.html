@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
+{% block html_attribs %}
+    {{ super() }}
+    xmlns:wb="http://open.weibo.com/wb"
+{% endblock html_attribs %}
+
+{% block head %}
+    {{ super() }}
+    <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js?appkey=2357900057" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
 {% block title %}ToDo - Login{% endblock %}
 
 {% block page_content %}
@@ -9,6 +19,8 @@
 </div>
 <div class="col-md-4">
     {{ wtf.quick_form(form) }}
+    <br>
+    <wb:login-button type="3,2" onlogin="login" onlogout="logout">登录按钮</wb:login-button>
     <br>
     <p>Forgot your password? <a href="{{ url_for('auth.reset_password_request') }}">Click here to reset it</a>.</p>
     <p>New user? <a href="{{ url_for('auth.register') }}">Click here to register</a>. </p>
