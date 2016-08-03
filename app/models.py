@@ -156,6 +156,7 @@ class User(UserMixin, db.Model):
         return self.can(Permission.ADMINISTER)
 
     def upgrade_bind_mode(self):
+        self.bind_mode = 0  # init bind_mode
         if self.email is not None:
             self.bind_mode |= BindMode.EMAIL
         if self.weibo_uid is not None:
