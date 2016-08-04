@@ -1,5 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required, current_user, current_app
+from weibo import APIClient
 
 from . import auth
 from ..models import User, BindMode
@@ -20,6 +21,9 @@ def before_request():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    code = request.args.get('code')
+    if code:
+        print 'code = %s' % code # if 'code' exists, ask for access_token
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -28,6 +32,16 @@ def login():
             return redirect(request.args.get('next') or url_for('main.index'))
         flash('Invalid username or password.')
     return render_template('auth/login.html', form=form)
+
+
+@auth.route('/login/weibo_login', methods=['GET'])
+def weibo_login():
+    app_key = current_app.config['APP_KEY']
+    app_secret = current_app.config['APP_SECRET']
+    callback_url = current_app.config['CALLBACK_URL']
+    client = APIClient(app_key=app_key, app_secret=app_secret, redirect_uri=callback_url)
+    url = client.get_authorize_url()
+    return redirect(url)
 
 
 @auth.route('/logout')
