@@ -62,3 +62,7 @@ div.task-title-bg:nth-child(3)>div.task-title
     background-color: darkgreen;
   }
 
+footer.footer
+{
+    margin-top: 80px;
+}
