@@ -20,7 +20,14 @@
 <div class="col-md-4">
     {{ wtf.quick_form(form) }}
     <br>
-    <wb:login-button type="3,2" onlogin="login" onlogout="logout">登录按钮</wb:login-button>
+    <div>
+        <p>Social Login:</p>
+            <ul class="list-inline">
+                <li>
+                    <wb:login-button type="3,2" onlogin="login" onlogout="logout">登录按钮</wb:login-button>
+                </li>
+            </ul>
+    </div>
     <br>
     <p>Forgot your password? <a href="{{ url_for('auth.reset_password_request') }}">Click here to reset it</a>.</p>
     <p>New user? <a href="{{ url_for('auth.register') }}">Click here to register</a>. </p>
