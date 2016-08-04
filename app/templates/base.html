@@ -58,7 +58,18 @@
     {% endfor %}
 
     {% block page_content %}{% endblock %}
+
+    {% block page_footer%}
+        <div class="panel-footer ">
+            <footer>
+                <p>123</p>
+                <span class="gglyphicon glyphicon-align-left"></span>
+            </footer>
+        </div>
+    {% endblock %}
 </div>
+
+
 {% endblock %}
 
 {% block scripts %}
