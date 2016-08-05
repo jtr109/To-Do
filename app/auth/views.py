@@ -74,14 +74,13 @@ def weibo_login():
     screen_name = client.statuses.user_timeline.get().get('statuses')[0].get('user').get('screen_name')
     print 'screen_name = %r' % screen_name
     user = User.query.filter_by(weibo_uid=uid).first()
-    if user is not None:
-        login_user(user, True)  # the second argument is 'remember me'
-        return redirect(request.args.get('next') or url_for('main.index'))
-    else:
-        # register weibo user
-        pass
-    return 'uid = %r' % uid
-
+    if user is None:
+        user = User(weibo_uid=uid, username=screen_name, confirmed=True)
+        user.upgrade_bind_mode()
+        db.session.add(user)
+        db.session.commit()
+    login_user(user)  # the second argument is 'remember me'
+    return redirect(request.args.get('next') or url_for('main.index'))
 
 
 @auth.route('/logout')
