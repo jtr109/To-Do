@@ -72,7 +72,6 @@ def weibo_login():
         return redirect(url_for('auth.login'))
     # worse practise to get screen_name
     screen_name = client.statuses.user_timeline.get().get('statuses')[0].get('user').get('screen_name')
-    print 'screen_name = %r' % screen_name
     user = User.query.filter_by(weibo_uid=uid).first()
     if user is None:
         user = User(weibo_uid=uid, username=screen_name, confirmed=True)
