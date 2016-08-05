@@ -1,5 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required, current_user, current_app
+from weibo import APIClient
+import urllib, re
 
 from . import auth
 from ..models import User, BindMode
@@ -18,6 +20,18 @@ def before_request():
         return redirect(url_for('auth.unconfirmed'))
 
 
+def get_code(full_path):
+    # get param code by getting full path and using RE
+    if 'code' in full_path:
+        full_path = urllib.unquote(full_path)
+        m = re.match('.*\?code=([\w\d]+).*', full_path)
+        if m is not None:
+            code = m.group(1)
+            return code
+    print 'Invalid param - code'
+    return None
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -27,7 +41,45 @@ def login():
             login_user(user, form.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
         flash('Invalid username or password.')
-    return render_template('auth/login.html', form=form)
+    param_next = request.args.get('next')
+    return render_template('auth/login.html', form=form, param_next=param_next)
+
+
+@auth.route('/login/weibo_auth', methods=['GET'])
+def weibo_auth():
+    app_key = current_app.config['APP_KEY']
+    app_secret = current_app.config['APP_SECRET']
+    callback_url = current_app.config['CALLBACK_URL']
+    client = APIClient(app_key=app_key, app_secret=app_secret, redirect_uri=callback_url)
+    url = client.get_authorize_url()
+    return redirect(url)
+
+
+@auth.route('/login/weibo_login', methods=['GET'])
+def weibo_login():
+    app_key = current_app.config['APP_KEY']
+    app_secret = current_app.config['APP_SECRET']
+    callback_url = current_app.config['CALLBACK_URL']
+    client = APIClient(app_key=app_key, app_secret=app_secret, redirect_uri=callback_url)
+    code = request.args.get('code')
+    r = client.request_access_token(code)
+    access_token = r.access_token
+    expires_in = r.expires_in
+    client.set_access_token(access_token, expires_in)
+    uid = r.get('uid')
+    if uid is None:
+        flash('Not found uid of weibo')
+        return redirect(url_for('auth.login'))
+    # worse practise to get screen_name
+    screen_name = client.statuses.user_timeline.get().get('statuses')[0].get('user').get('screen_name')
+    user = User.query.filter_by(weibo_uid=uid).first()
+    if user is None:
+        user = User(weibo_uid=uid, username=screen_name, confirmed=True)
+        user.upgrade_bind_mode()
+        db.session.add(user)
+        db.session.commit()
+    login_user(user)  # the second argument is 'remember me'
+    return redirect(request.args.get('next') or url_for('main.index'))
 
 
 @auth.route('/logout')

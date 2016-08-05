@@ -8,7 +8,9 @@
 
 {% block head %}
     {{ super() }}
+    {#
     <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js?appkey=2357900057" type="text/javascript" charset="utf-8"></script>
+    #}
 {% endblock %}
 
 {% block title %}ToDo - Login{% endblock %}
@@ -20,7 +22,19 @@
 <div class="col-md-4">
     {{ wtf.quick_form(form) }}
     <br>
-    <wb:login-button type="3,2" onlogin="login" onlogout="logout">登录按钮</wb:login-button>
+    <div>
+        <p>Social Login:</p>
+            <ul class="list-inline">
+                {#
+                <li>
+                    <wb:login-button type="3,2" onlogin="login" onlogout="logout">登录按钮</wb:lkogin-button>
+                </li>
+                #}
+                <li><a href="{{ url_for('auth.weibo_auth') }}" role="button">
+                    <img src="{{ url_for('static', filename='weibo_loginButton_24.png') }}" alt="Weibo login">
+                </a></li>
+            </ul>
+    </div>
     <br>
     <p>Forgot your password? <a href="{{ url_for('auth.reset_password_request') }}">Click here to reset it</a>.</p>
     <p>New user? <a href="{{ url_for('auth.register') }}">Click here to register</a>. </p>
