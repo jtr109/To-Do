@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user, current_app
 from weibo import APIClient
+import urllib
 
 from . import auth
 from ..models import User, BindMode
@@ -19,11 +20,18 @@ def before_request():
         return redirect(url_for('auth.unconfirmed'))
 
 
+def get_code(full_path):
+    # get param code by getting full path and using RE
+    full_path = urllib.unquote(full_path).decode('utf8')
+    print full_path
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    code = request.args.get('code')
-    if code:
-        print 'code = %s' % code # if 'code' exists, ask for access_token
+    full_path = request.full_path
+    if 'code' in full_path:
+        get_code(full_path)
+    # if there is no 'code' in request
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
