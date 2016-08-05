@@ -63,17 +63,20 @@ def weibo_login():
     client = APIClient(app_key=app_key, app_secret=app_secret, redirect_uri=callback_url)
     code = request.args.get('code')
     r = client.request_access_token(code)
-    # access_token = r.access_token
-    # expires_in = r.expires_in
-    # client.set_access_token(access_token, expires_in)
+    access_token = r.access_token
+    expires_in = r.expires_in
+    client.set_access_token(access_token, expires_in)
     uid = r.get('uid')
     if uid is None:
         flash('Not found uid of weibo')
         return redirect(url_for('auth.login'))
-    print 'uid = %r' % uid
+    # worse practise to get screen_name
+    screen_name = client.statuses.user_timeline.get().get('statuses')[0].get('user').get('screen_name')
+    print 'screen_name = %r' % screen_name
     user = User.query.filter_by(weibo_uid=uid).first()
     if user is not None:
-        pass
+        login_user(user, True)  # the second argument is 'remember me'
+        return redirect(request.args.get('next') or url_for('main.index'))
     else:
         # register weibo user
         pass
