@@ -22,20 +22,18 @@ def before_request():
 
 def get_code(full_path):
     # get param code by getting full path and using RE
-    full_path = urllib.unquote(full_path)
-    m = re.match('.*\?code=([\w\d]+).*', full_path)
-    if m is not None:
-        code = m.group(1)
-        return code
-    print 'invalid parameter - code'
+    if 'code' in full_path:
+        full_path = urllib.unquote(full_path)
+        m = re.match('.*\?code=([\w\d]+).*', full_path)
+        if m is not None:
+            code = m.group(1)
+            return code
+    print 'Invalid param - code'
+    return None
 
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    full_path = request.full_path
-    if 'code' in full_path:
-        get_code(full_path)
-    # if there is no 'code' in request
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -43,7 +41,18 @@ def login():
             login_user(user, form.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
         flash('Invalid username or password.')
-    return render_template('auth/login.html', form=form)
+    param_next = request.args.get('next')
+    return render_template('auth/login.html', form=form, param_next=param_next)
+
+
+@auth.route('/login/weibo_auth', methods=['GET'])
+def weibo_auth():
+    app_key = current_app.config['APP_KEY']
+    app_secret = current_app.config['APP_SECRET']
+    callback_url = current_app.config['CALLBACK_URL']
+    client = APIClient(app_key=app_key, app_secret=app_secret, redirect_uri=callback_url)
+    url = client.get_authorize_url()
+    return redirect(url)
 
 
 @auth.route('/login/weibo_login', methods=['GET'])
@@ -52,8 +61,24 @@ def weibo_login():
     app_secret = current_app.config['APP_SECRET']
     callback_url = current_app.config['CALLBACK_URL']
     client = APIClient(app_key=app_key, app_secret=app_secret, redirect_uri=callback_url)
-    url = client.get_authorize_url()
-    return redirect(url)
+    code = request.args.get('code')
+    r = client.request_access_token(code)
+    # access_token = r.access_token
+    # expires_in = r.expires_in
+    # client.set_access_token(access_token, expires_in)
+    uid = r.get('uid')
+    if uid is None:
+        flash('Not found uid of weibo')
+        return redirect(url_for('auth.login'))
+    print 'uid = %r' % uid
+    user = User.query.filter_by(weibo_uid=uid).first()
+    if user is not None:
+        pass
+    else:
+        # register weibo user
+        pass
+    return 'uid = %r' % uid
+
 
 
 @auth.route('/logout')
