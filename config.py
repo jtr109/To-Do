@@ -1,4 +1,5 @@
 import os
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -16,6 +17,9 @@ class Config:
     TODO_ADMIN = os.environ.get('TODO_ADMIN')
     TODO_POSTS_PER_PAGE = 10
     SSL_DISABLE = True
+    APP_KEY = os.environ.get('APP_KEY')
+    APP_SECRET = os.environ.get('APP_SECRET')
+    CALLBACK_URL = os.environ.get('CALLBACK_URL')
 
     @staticmethod
     def init_app(app):

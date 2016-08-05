@@ -8,7 +8,9 @@
 
 {% block head %}
     {{ super() }}
+    {#
     <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js?appkey=2357900057" type="text/javascript" charset="utf-8"></script>
+    #}
 {% endblock %}
 
 {% block title %}ToDo - Login{% endblock %}
@@ -23,9 +25,14 @@
     <div>
         <p>Social Login:</p>
             <ul class="list-inline">
+                {#
                 <li>
-                    <wb:login-button type="3,2" onlogin="login" onlogout="logout">登录按钮</wb:login-button>
+                    <wb:login-button type="3,2" onlogin="login" onlogout="logout">登录按钮</wb:lkogin-button>
                 </li>
+                #}
+                <li><a href="{{ url_for('auth.weibo_auth') }}" role="button">
+                    <img src="{{ url_for('static', filename='weibo_loginButton_24.png') }}" alt="Weibo login">
+                </a></li>
             </ul>
     </div>
     <br>
