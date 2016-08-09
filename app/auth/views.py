@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user, current_app
-from weibo import APIClient
+from weibo import APIClient, APIError
 import urllib, re
 
 from . import auth
@@ -62,15 +62,18 @@ def weibo_login():
     callback_url = current_app.config['CALLBACK_URL']
     client = APIClient(app_key=app_key, app_secret=app_secret, redirect_uri=callback_url)
     code = request.args.get('code')
-    r = client.request_access_token(code)
+    try:
+        r = client.request_access_token(code)
+    except APIError:
+        flash('Invalid weibo code. Please Try again.')
+        return redirect(request.args.get('next') or url_for('auth.login'))
     access_token = r.access_token
     expires_in = r.expires_in
     client.set_access_token(access_token, expires_in)
     uid = r.get('uid')
     if uid is None:
         flash('Not found uid of weibo')
-        return redirect(url_for('auth.login'))
-    # worse practise to get screen_name
+        return redirect(request.args.get('next') or url_for('auth.login'))
     screen_name = client.statuses.user_timeline.get().get('statuses')[0].get('user').get('screen_name')
     user = User.query.filter_by(weibo_uid=uid).first()
     if user is None:
