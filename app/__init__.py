@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from flask_login import LoginManager
 from flask_moment import Moment
-from flask_restful import Api, Resource
+from flask_restful import Api
 
 from config import config
 
@@ -12,6 +12,7 @@ bootstrap = Bootstrap()
 db = SQLAlchemy()
 mail = Mail()
 moment = Moment()
+restful_api = Api()
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
@@ -43,13 +44,6 @@ def create_app(config_name):
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 
     from .api_2_0 import api2 as api_2_0_blueprint
-    restful_api = Api(api_2_0_blueprint)
-
-    class Test(Resource):
-        def get(self, id):
-            return {'test': 'success'}
-
-    restful_api.add_resource(Test, '/test/<int:id>')
     app.register_blueprint(api_2_0_blueprint, url_prefix='/restful_api/v2.0')
 
     return app

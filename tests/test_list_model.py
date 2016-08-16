@@ -1,6 +1,6 @@
 import unittest
-from app import db, create_app
-from app.models import ToDoList, Task, ListEvent
+from api_app import db, create_app
+from api_app.models import ToDoList, Task, ListEvent
 
 
 class ListEventTest(unittest.TestCase):
