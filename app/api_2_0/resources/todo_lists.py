@@ -34,12 +34,12 @@ class TodoListsAPI(Resource):
         todo_lists = pagination.items
         prev = None
         if pagination.has_prev:
-            prev = url_for('api2.resource.TodoListsAPI', page=page-1, _external=True)
+            prev = url_for('api2.TodoListsAPI', page=page-1, _external=True)
         next = None
         if pagination.has_next:
-            next = url_for('api2.resource.TodoListsAPI', page=page+1, _external=True)
+            next = url_for('api2.TodoListsAPI', page=page+1, _external=True)
         return {
-            'todo_lists': [t.to_json() for t in todo_lists],
+            'todo_lists': [t.to_json(version='2.0') for t in todo_lists],
             'prev': prev,
             'next': next,
             'count': pagination.total

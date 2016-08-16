@@ -221,15 +221,25 @@ class ToDoList(db.Model):
         for e in list_events:
             db.session.delete(e)
 
-    def to_json(self):
-        json_todo_list = {
-            'url': url_for('api.get_todo_list', list_id=self.id, _external=True),
-            'title': self.title,
-            'timestamp': self.timestamp,
-            'master': url_for('api.get_user', user_id=self.master_id, _external=True),
-            'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
-            'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
-        }
+    def to_json(self, version='1.0'):
+        if(version=='1.0'):
+            json_todo_list = {
+                'url': url_for('api.get_todo_list', list_id=self.id, _external=True),
+                'title': self.title,
+                'timestamp': self.timestamp,
+                'master': url_for('api.get_user', user_id=self.master_id, _external=True),
+                'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
+                'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
+            }
+        elif(version=='2.0'):
+            json_todo_list = {
+                'url': url_for('api2.TodoListAPI', list_id=self.id, _external=True),
+                'title': self.title,
+                'timestamp': self.timestamp,
+                'master': url_for('api2.UserAPI', user_id=self.master_id, _external=True),
+                'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
+                'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
+            }
         return json_todo_list
 
     @staticmethod
