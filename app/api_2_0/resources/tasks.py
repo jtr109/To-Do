@@ -16,6 +16,14 @@ post_parser.add_argument(
     help='The body of task',
 )
 
+state_parser = reqparse.RequestParser()
+state_parser.add_argument(
+    'state', dest='state',
+    choices=('todo', 'doing', 'done',),
+    location='json', required=True,
+    help='The state of task (todo, doing, done)',
+)
+
 task_fields = {
     'body': fields.String,
     'state': fields.String,
@@ -54,31 +62,13 @@ class TasksAPI(Resource):
             'done_tasks': [jsonify_task(done_task) for done_task in done_tasks],
         }
 
+    @marshal_with(task_fields)
+    def post(self, list_id):
+        args = post_parser.parse_args()
+        task = Task.create_new(body=args.body, list_id=list_id)
+        return jsonify_task(task), 201
+
 restful_api.add_resource(TasksAPI, '/todo_lists/<int:list_id>/tasks/', endpoint='TasksAPI')
-
-
-@api2.route('/todo_lists/<int:list_id>/tasks/', methods=['POST'])
-def new_tasks(list_id):
-    task = Task.from_json(request.json)
-    task.list_id = list_id
-    db.session.add(task)
-    db.session.commit()
-    return jsonify_task(task), 201, \
-           {'Location': url_for('api.get_todo_list_tasks', list_id=list_id, _external=True)}  # todo: change url_for
-
-
-'''
-@api2.route('/todo_lists/<int:list_id>/tasks/')
-def get_todo_list_tasks(list_id):
-    todo_tasks = Task.query.filter_by(list_id=list_id, state='todo')
-    doing_tasks = Task.query.filter_by(list_id=list_id, state='doing')
-    done_tasks = Task.query.filter_by(list_id=list_id, state='done')
-    return jsonify({
-        'todo_tasks': [todo_task.to_json() for todo_task in todo_tasks],
-        'doing_tasks': [doing_task.to_json() for doing_task in doing_tasks],
-        'done_tasks': [done_task.to_json() for done_task in done_tasks],
-    })
-'''
 
 
 class TaskAPI(Resource):
@@ -87,40 +77,22 @@ class TaskAPI(Resource):
         task = Task.query.get_or_404(task_id)
         return jsonify_task(task)
 
+    @marshal_with(task_fields)
+    def put(self, task_id):
+        args = state_parser.parse_args()
+        task = Task.query.filter_by(id=task_id).first()
+        status = task.change_state(args.state, g.current_user)
+        if status[0] == 1:
+            return bad_request(status[1])
+        return jsonify_task(task), 202, \
+        {'Location': url_for('api2.TodoListAPI', list_id=task.list_id, _external=True)}
+
+    def delete(self, task_id):
+        task = Task.query.filter_by(id=task_id).first()
+        if task.in_list.master != g.current_user:
+            return bad_request('Invalid master.')
+        db.session.delete(task)
+        return None, 303, \
+            {'Location': url_for('api.get_todo_list', list_id=task.list_id, _external=True)}
+
 restful_api.add_resource(TaskAPI, '/tasks/<int:task_id>', endpoint='TaskAPI')
-
-
-'''
-@api2.route('/tasks/<int:task_id>')
-def get_task(task_id):
-    task = Task.query.get_or_404(task_id)
-    return jsonify(task.to_json())
-'''
-
-
-@api2.route('/tasks/<int:task_id>', methods=['PATCH'])
-def change_state_of_task(task_id):
-    task = Task.query.filter_by(id=task_id).first()
-    todo_list = task.in_list
-    list_id = todo_list.id
-    if todo_list.master != g.current_user or task.in_list != todo_list:
-        return bad_request('Invalid list.')
-    state = request.json.get('state', task.state)
-    if state not in ['todo', 'doing', 'done']:
-        return bad_request('Invalid state')
-    task.state = state
-    db.session.add(task)
-    return jsonify(task.to_json()), 202, \
-        {'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)}
-
-
-@api2.route('/tasks/<int:task_id>', methods=['DELETE'])
-def delete_task(task_id):
-    task = Task.query.filter_by(id=task_id).first()
-    todo_list = task.in_list
-    list_id = todo_list.id
-    if todo_list.master != g.current_user or task.in_list != todo_list:
-        return bad_request('Invalid list.')
-    db.session.delete(task)
-    return jsonify(None), 303 ,\
-           {'Location': url_for('api.get_todo_list', list_id=list_id, _external=True)}

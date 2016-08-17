@@ -319,22 +319,27 @@ class Task(db.Model):
         }
         return json_task
 
-    def get_info(self):
-        info_dict = {
-            'task_id': self.id,
-            'body': self.body,
-            'state': self.state,
-            'timestamp': self.timestamp,
-            'list_id': self.list_id,
-        }
-        return info_dict
+    def change_state(self, state, master):
+        if self.in_list.master != master:
+            return 1, 'Invalid master'
+        self.state = state
+        db.session.add(self)
+        db.session.commit()
+        return 0, 'Done'
+
 
     @staticmethod
     def from_json(json_todo_list):
         body = json_todo_list.get('body')
         if body is None or body == '':
             raise ValidationError('todo list does not have a title')
-        return Task(body=body)
+
+    @staticmethod
+    def create_new(body, list_id):
+        task = Task(body=body, list_id=list_id)
+        db.session.add(task)
+        db.session.commit()
+        return task
 
     def __repr__(self):
         return '<Task %r>' % self.id
