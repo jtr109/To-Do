@@ -317,6 +317,16 @@ class Task(db.Model):
         }
         return json_task
 
+    def get_info(self):
+        info_dict = {
+            'task_id': self.id,
+            'body': self.body,
+            'state': self.state,
+            'timestamp': self.timestamp,
+            'list_id': self.list_id,
+        }
+        return info_dict
+
     @staticmethod
     def from_json(json_todo_list):
         body = json_todo_list.get('body')

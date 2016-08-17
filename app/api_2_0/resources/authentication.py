@@ -1,13 +1,29 @@
-from flask import g, jsonify
+from flask import g
 from flask_httpauth import HTTPBasicAuth
 from ...models import User
 from .. import api2
 from .errors import unauthorized, forbidden
 # flask-restful
-from flask_restful import Resource
+from flask_restful import Resource, fields, marshal_with
 from .. import restful_api
 
 auth = HTTPBasicAuth()
+
+
+token_fields = {
+    'user_id': fields.Integer,
+    'token': fields.String,
+    'expiration': fields.Integer,
+}
+
+
+def jsonify_token(user):
+    json_token = {
+        'user_id': user.id,
+        'token': user.generate_auth_token(expiration=3600),
+        'expiration': 3600,
+    }
+    return json_token
 
 
 @auth.verify_password
@@ -40,15 +56,11 @@ def before_request():
         return forbidden('Unconfirmed account')
 
 
-class UserAPI(Resource):
+class TokenAPI(Resource):
+    @marshal_with(token_fields)
     def get(self):
         if g.current_user.is_anonymous or g.token_used:
             return unauthorized('Invalid credentials')
-        ret = {
-            'user_id': g.current_user.id,
-            'token': g.current_user.generate_auth_token(expiration=3600),
-            'expiration': 3600,
-        }
-        return jsonify(ret)
+        return jsonify_token(g.current_user)
 
-restful_api.add_resource(UserAPI, '/token', endpoint='TokenAPI')
+restful_api.add_resource(TokenAPI, '/token', endpoint='TokenAPI')
