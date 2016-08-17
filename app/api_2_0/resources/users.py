@@ -12,20 +12,20 @@ user_fields= {
 
 
 def jsonify_user(user):
-    user_info = user.get_info()  # 'user_id', 'username'
     user_json = {
-        'url': url_for('api2.UserAPI', user_id=user_info['user_id'], _external=True),
-        'username': user_info['username'],
+        'url': url_for('api2.UserAPI', user_id=user.id, _external=True),
+        'username': user.username,
         'todo_lists': url_for('api2.TodoListsAPI', _external=True),
     }
     return user_json
+
 
 # should be removed in prod env
 class AllUsersAPI(Resource):
     def get(self):
         users = User.query.all()
-        users_link = map(lambda user: url_for('api2.UserAPI', user_id=user.id, _external=True), users)
-        return {'users': users_link}
+        users_url = map(lambda user: url_for('api2.UserAPI', user_id=user.id, _external=True), users)
+        return {'users': users_url}
 
 restful_api.add_resource(AllUsersAPI, '/users/', endpoint='AllUsersAPI')
 
