@@ -31,14 +31,13 @@ todo_lists_fields = {
 
 
 def jsonify_todo_list(todo_list):
-    info_dict = todo_list.get_info()
     json_todo_list = {
-        'url': url_for('api2.TodoListAPI', list_id=info_dict.get('list_id'), _external=True),
-        'title': info_dict.get('title'),
-        'timestamp': info_dict.get('timestamp'),
-        'master': url_for('api2.UserAPI', user_id=info_dict.get('list_id'), _external=True),
-        'tasks': url_for('api.get_todo_list_tasks', list_id=info_dict.get('list_id'), _external=True),
-        'events': url_for('api.get_todo_list_events', list_id=info_dict.get('list_id'), _external=True),
+        'url': url_for('api2.TodoListAPI', list_id=todo_list.id, _external=True),
+        'title': todo_list.title,
+        'timestamp': todo_list.timestamp,
+        'master': url_for('api2.UserAPI', user_id=todo_list.master_id, _external=True),
+        'tasks': url_for('api.get_todo_list_tasks', list_id=todo_list.id, _external=True),
+        'events': url_for('api.get_todo_list_events', list_id=todo_list.id, _external=True),
     }
     return json_todo_list
 
@@ -47,7 +46,8 @@ class TodoListsAPI(Resource):
     @marshal_with(todo_lists_fields)
     def get(self):
         page = request.args.get('page', 1, type=int)
-        pagination = ToDoList.query.filter_by(master=g.current_user).paginate(
+        pagination = ToDoList.query.filter_by(master=g.current_user).\
+            order_by(ToDoList.timestamp.desc()).paginate(
             page, per_page=current_app.config['TODO_POSTS_PER_PAGE'],
             error_out=False)
         todo_lists = pagination.items

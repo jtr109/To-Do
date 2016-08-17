@@ -238,6 +238,7 @@ class ToDoList(db.Model):
                 'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
                 'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
             }
+        '''
         elif(version=='2.0'):
             json_todo_list = {
                 'url': url_for('api2.TodoListAPI', list_id=self.id, _external=True),
@@ -247,6 +248,7 @@ class ToDoList(db.Model):
                 'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
                 'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
             }
+        '''
         return json_todo_list
 
     def get_info(self):
