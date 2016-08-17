@@ -178,6 +178,13 @@ class User(UserMixin, db.Model):
         }
         return json_user
 
+    def get_info(self):
+        info_dict = {
+            'user_id': self.id,
+            'username': self.username,
+        }
+        return info_dict
+
     def __repr__(self):
         return '<User %r>' % self.username
 
