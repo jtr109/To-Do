@@ -256,6 +256,13 @@ class ToDoList(db.Model):
             raise ValidationError('todo list does not have a title')
         return ToDoList(title=title)
 
+    @staticmethod
+    def create_list(title, master):
+        todo_list = ToDoList(title=title, master=master)
+        db.session.add(todo_list)
+        db.session.commit()
+        return todo_list
+
     def __repr__(self):
         return '<ToDoList %r>' % self.id
 
