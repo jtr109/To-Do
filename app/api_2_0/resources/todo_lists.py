@@ -57,7 +57,7 @@ class TodoListsAPI(Resource):
         print("args.title is %r" % args.title)
         # request: {'title=example title'}
         master = g.current_user
-        todo_list = ToDoList.create_list(title=args.title, master=master)
+        todo_list = ToDoList.create_new(title=args.title, master=master)
         return todo_list.to_json(version='2.0'), 201
 
 restful_api.add_resource(TodoListsAPI, '/todo_lists/', endpoint='TodoListsAPI')

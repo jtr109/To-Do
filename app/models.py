@@ -249,6 +249,7 @@ class ToDoList(db.Model):
             }
         return json_todo_list
 
+
     @staticmethod
     def from_json(json_todo_list):
         title = json_todo_list.get('title')
@@ -257,7 +258,7 @@ class ToDoList(db.Model):
         return ToDoList(title=title)
 
     @staticmethod
-    def create_list(title, master):
+    def create_new(title, master):
         todo_list = ToDoList(title=title, master=master)
         db.session.add(todo_list)
         db.session.commit()
