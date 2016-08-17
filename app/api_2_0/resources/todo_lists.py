@@ -1,11 +1,18 @@
 from flask import jsonify, request, g, url_for, current_app
 # flask-restful
-from flask_restful import Resource, fields, marshal_with
+from flask_restful import Resource, fields, marshal_with, reqparse
 from .. import restful_api
 
 from ... import db
 from ...models import ToDoList
 from .. import api2
+
+post_parser = reqparse.RequestParser()
+post_parser.add_argument(
+    'title', dest='title',
+    location='form', required=True,
+    help='The title of list',
+)
 
 todo_list_fields = {
     'events': fields.String,
@@ -45,16 +52,15 @@ class TodoListsAPI(Resource):
             'count': pagination.total
         }
 
-'''
+    @marshal_with(todo_list_fields)
     def post(self):
-        # request: {'title': 'example title'}
+        # request: {'title=example title'}
         todo_list = ToDoList.from_json(request.json)
         todo_list.master = g.current_user
         db.session.add(todo_list)
         db.session.commit()
-        return todo_list.to_json(), 201  # , \
-               # {'Location': url_for('api2.get_todo_list', list_id=todo_list.id, _external=True)}
-'''
+        return todo_list.to_json(version='2.0'), 201
+
 restful_api.add_resource(TodoListsAPI, '/todo_lists/', endpoint='TodoListsAPI')
 
 
