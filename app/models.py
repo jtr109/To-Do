@@ -249,6 +249,15 @@ class ToDoList(db.Model):
             }
         return json_todo_list
 
+    def get_info(self):
+        info_dict = {
+            'list_id': self.id,
+            'title': self.title,
+            'timestamp': self.timestamp,
+            'master_id': self.master_id,
+        }
+        return info_dict
+
 
     @staticmethod
     def from_json(json_todo_list):
