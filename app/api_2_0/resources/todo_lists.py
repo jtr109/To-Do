@@ -36,7 +36,7 @@ def jsonify_todo_list(todo_list):
         'title': todo_list.title,
         'timestamp': todo_list.timestamp,
         'master': url_for('api2.UserAPI', user_id=todo_list.master_id, _external=True),
-        'tasks': url_for('api.get_todo_list_tasks', list_id=todo_list.id, _external=True),
+        'tasks': url_for('api2.TasksAPI', list_id=todo_list.id, _external=True),
         'events': url_for('api.get_todo_list_events', list_id=todo_list.id, _external=True),
     }
     return json_todo_list
@@ -68,7 +68,9 @@ class TodoListsAPI(Resource):
     def post(self):
         args = post_parser.parse_args()
         master = g.current_user
-        todo_list = ToDoList.create_new(title=args.title, master=master)
+        todo_list = ToDoList(title=args.title, master=master)
+        db.session.add(todo_list)
+        db.session.commit()
         return jsonify_todo_list(todo_list), 201
 
 restful_api.add_resource(TodoListsAPI, '/todo_lists/', endpoint='TodoListsAPI')

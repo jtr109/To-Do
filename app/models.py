@@ -228,27 +228,15 @@ class ToDoList(db.Model):
         for e in list_events:
             db.session.delete(e)
 
-    def to_json(self, version='1.0'):
-        if(version=='1.0'):
-            json_todo_list = {
-                'url': url_for('api.get_todo_list', list_id=self.id, _external=True),
-                'title': self.title,
-                'timestamp': self.timestamp,
-                'master': url_for('api.get_user', user_id=self.master_id, _external=True),
-                'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
-                'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
-            }
-        '''
-        elif(version=='2.0'):
-            json_todo_list = {
-                'url': url_for('api2.TodoListAPI', list_id=self.id, _external=True),
-                'title': self.title,
-                'timestamp': self.timestamp,
-                'master': url_for('api2.UserAPI', user_id=self.master_id, _external=True),
-                'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
-                'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
-            }
-        '''
+    def to_json(self):
+        json_todo_list = {
+            'url': url_for('api.get_todo_list', list_id=self.id, _external=True),
+            'title': self.title,
+            'timestamp': self.timestamp,
+            'master': url_for('api.get_user', user_id=self.master_id, _external=True),
+            'tasks': url_for('api.get_todo_list_tasks', list_id=self.id, _external=True),
+            'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
+        }
         return json_todo_list
 
     def get_info(self):
@@ -267,13 +255,6 @@ class ToDoList(db.Model):
         if title is None or title == '':
             raise ValidationError('todo list does not have a title')
         return ToDoList(title=title)
-
-    @staticmethod
-    def create_new(title, master):
-        todo_list = ToDoList(title=title, master=master)
-        db.session.add(todo_list)
-        db.session.commit()
-        return todo_list
 
     def __repr__(self):
         return '<ToDoList %r>' % self.id
@@ -319,27 +300,11 @@ class Task(db.Model):
         }
         return json_task
 
-    def change_state(self, state, master):
-        if self.in_list.master != master:
-            return 1, 'Invalid master'
-        self.state = state
-        db.session.add(self)
-        db.session.commit()
-        return 0, 'Done'
-
-
     @staticmethod
     def from_json(json_todo_list):
         body = json_todo_list.get('body')
         if body is None or body == '':
             raise ValidationError('todo list does not have a title')
-
-    @staticmethod
-    def create_new(body, list_id):
-        task = Task(body=body, list_id=list_id)
-        db.session.add(task)
-        db.session.commit()
-        return task
 
     def __repr__(self):
         return '<Task %r>' % self.id

@@ -5,7 +5,7 @@ from .. import api2
 from .errors import unauthorized, forbidden
 # flask-restful
 from flask_restful import Resource, fields, marshal_with
-from .. import restful_api
+from app import restful_api
 
 auth = HTTPBasicAuth()
 
