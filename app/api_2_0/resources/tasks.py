@@ -24,6 +24,12 @@ task_fields = {
     'url': fields.String,
 }
 
+tasks_fields = {
+    'todo_tasks': fields.Nested(task_fields),
+    'doing_tasks': fields.Nested(task_fields),
+    'done_tasks': fields.Nested(task_fields),
+}
+
 
 def jsonify_task(task):
     json_task = {
@@ -36,6 +42,21 @@ def jsonify_task(task):
     return json_task
 
 
+class TasksAPI(Resource):
+    @marshal_with(tasks_fields)
+    def get(self, list_id):
+        todo_tasks = Task.query.filter_by(list_id=list_id, state='todo')
+        doing_tasks = Task.query.filter_by(list_id=list_id, state='doing')
+        done_tasks = Task.query.filter_by(list_id=list_id, state='done')
+        return {
+            'todo_tasks': [jsonify_task(todo_task) for todo_task in todo_tasks],
+            'doing_tasks': [jsonify_task(doing_task) for doing_task in doing_tasks],
+            'done_tasks': [jsonify_task(done_task) for done_task in done_tasks],
+        }
+
+restful_api.add_resource(TasksAPI, '/todo_lists/<int:list_id>/tasks/', endpoint='TasksAPI')
+
+
 @api2.route('/todo_lists/<int:list_id>/tasks/', methods=['POST'])
 def new_tasks(list_id):
     task = Task.from_json(request.json)
@@ -46,6 +67,7 @@ def new_tasks(list_id):
            {'Location': url_for('api.get_todo_list_tasks', list_id=list_id, _external=True)}  # todo: change url_for
 
 
+'''
 @api2.route('/todo_lists/<int:list_id>/tasks/')
 def get_todo_list_tasks(list_id):
     todo_tasks = Task.query.filter_by(list_id=list_id, state='todo')
@@ -56,6 +78,7 @@ def get_todo_list_tasks(list_id):
         'doing_tasks': [doing_task.to_json() for doing_task in doing_tasks],
         'done_tasks': [done_task.to_json() for done_task in done_tasks],
     })
+'''
 
 
 class TaskAPI(Resource):
