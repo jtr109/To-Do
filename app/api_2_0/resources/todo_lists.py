@@ -76,12 +76,11 @@ class TodoListAPI(Resource):
         todo_list = ToDoList.query.get_or_404(list_id)
         return todo_list.to_json()
 
+    def delete(self, list_id):
+        todo_list = ToDoList.query.get_or_404(list_id)
+        db.session.delete(todo_list)
+        return '', 303, \
+            {'Location': url_for('api.get_todo_lists', _external=True)}
+
 restful_api.add_resource(TodoListAPI, '/todo_lists/<int:list_id>', endpoint='TodoListAPI')
 
-
-@api2.route('/todo_lists/<int:list_id>', methods=['DELETE'])
-def delete_todo_list(list_id):
-    todo_list = ToDoList.query.get_or_404(list_id)
-    db.session.delete(todo_list)
-    return jsonify(None), 303, \
-           {'Location': url_for('api.get_todo_lists', _external=True)}
