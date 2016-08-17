@@ -1,7 +1,7 @@
 from flask import request, g, url_for, current_app
 # flask-restful
 from flask_restful import Resource, fields, marshal_with, reqparse
-from .. import restful_api
+from app import restful_api
 
 from ... import db
 from ...models import ToDoList
@@ -23,10 +23,10 @@ todo_list_fields = {
 }
 
 todo_lists_fields = {
-    'count': fields.Integer,
-    'next': fields.String,
-    'prev': fields.String,
     'todo_lists': fields.Nested(todo_list_fields),
+    'count': fields.Integer,
+    'prev': fields.String,
+    'next': fields.String,
 }
 
 
