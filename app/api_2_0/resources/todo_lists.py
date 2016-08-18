@@ -74,7 +74,7 @@ class TodoListsAPI(Resource):
         db.session.commit()
         return to_json_todo_list(todo_list), 201
 
-restful_api.add_resource(TodoListsAPI, '/todo_lists/', endpoint='TodoListsAPI')
+restful_api.add_resource(TodoListsAPI, '/todo-lists/', endpoint='TodoListsAPI')
 
 
 class TodoListAPI(Resource):
@@ -94,5 +94,5 @@ class TodoListAPI(Resource):
         return None, 303, \
             {'Location': url_for('api2.TodoListsAPI', _external=True)}
 
-restful_api.add_resource(TodoListAPI, '/todo_lists/<int:list_id>', endpoint='TodoListAPI')
+restful_api.add_resource(TodoListAPI, '/todo-lists/<int:list_id>', endpoint='TodoListAPI')
 

@@ -25,7 +25,7 @@ ADMINISTOR                  |0b10000000 (0x80)   |admin web
 
 ## API Documents (v1.0)
 
-*Tips*: user '/restful_api/v2.0' for v2.0 restful api
+*Tips*: user '/restful-api/v2.0' for v2.0 restful api
 
 ### `GET` /api/v1.0/token
 

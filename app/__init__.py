@@ -44,6 +44,6 @@ def create_app(config_name):
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 
     from .api_2_0 import api2 as api_2_0_blueprint
-    app.register_blueprint(api_2_0_blueprint, url_prefix='/restful_api/v2.0')
+    app.register_blueprint(api_2_0_blueprint, url_prefix='/restful-api/v2.0')
 
     return app

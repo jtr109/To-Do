@@ -6,7 +6,7 @@ from . import api
 from .errors import bad_request
 
 
-@api.route('/todo_lists/<int:list_id>/tasks/', methods=['POST'])
+@api.route('/todo-lists/<int:list_id>/tasks/', methods=['POST'])
 def new_tasks(list_id):
     task = Task.from_json(request.json)
     task.list_id = list_id
@@ -16,7 +16,7 @@ def new_tasks(list_id):
            {'Location': url_for('api.get_todo_list_tasks', list_id=list_id, _external=True)}
 
 
-@api.route('/todo_lists/<int:list_id>/tasks/')
+@api.route('/todo-lists/<int:list_id>/tasks/')
 def get_todo_list_tasks(list_id):
     todo_tasks = Task.query.filter_by(list_id=list_id, state='todo')
     doing_tasks = Task.query.filter_by(list_id=list_id, state='doing')

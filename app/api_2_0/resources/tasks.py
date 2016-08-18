@@ -77,7 +77,7 @@ class TasksAPI(Resource):
         db.session.commit()
         return to_json_task(task), 201
 
-restful_api.add_resource(TasksAPI, '/todo_lists/<int:list_id>/tasks/', endpoint='TasksAPI')
+restful_api.add_resource(TasksAPI, '/todo-lists/<int:list_id>/tasks/', endpoint='TasksAPI')
 
 
 class TaskAPI(Resource):
