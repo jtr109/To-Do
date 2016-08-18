@@ -5,6 +5,7 @@ from app import restful_api
 
 from ... import db
 from ...models import ToDoList
+from .errors import unauthorized
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument(
@@ -80,11 +81,15 @@ class TodoListAPI(Resource):
     @marshal_with(todo_list_fields)
     def get(self, list_id):
         todo_list = ToDoList.query.get_or_404(list_id)
+        if todo_list.master != g.current_user:
+            return unauthorized("Invalid User.")
         print todo_list.master_id
         return to_json_todo_list(todo_list)
 
     def delete(self, list_id):
         todo_list = ToDoList.query.get_or_404(list_id)
+        if todo_list.master != g.current_user:
+            return unauthorized("Invalid User.")
         db.session.delete(todo_list)
         return None, 303, \
             {'Location': url_for('api2.TodoListsAPI', _external=True)}

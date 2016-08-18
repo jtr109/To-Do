@@ -3,7 +3,8 @@ from flask import request, g, url_for, current_app
 from flask_restful import Resource, fields, marshal_with
 from app import restful_api
 
-from ...models import ListEvent
+from ...models import ListEvent, ToDoList
+from .errors import unauthorized
 
 event_fields = {
     'url': fields.String,
@@ -34,6 +35,8 @@ class EventAPI(Resource):
     @marshal_with(event_fields)
     def get(self, event_id):
         event = ListEvent.query.get_or_404(event_id)
+        if event.in_list.master != g.current_user:
+            return unauthorized("Invalid master!")
         return to_json_event(event)
 
 restful_api.add_resource(EventAPI, '/events/<int:event_id>', endpoint='EventAPI')
@@ -42,6 +45,9 @@ restful_api.add_resource(EventAPI, '/events/<int:event_id>', endpoint='EventAPI'
 class EventsAPI(Resource):
     @marshal_with(events_fields)
     def get(self, list_id):
+        todo_list = ToDoList.query.get_or_404(list_id)
+        if todo_list.master != g.current_user:
+            return unauthorized("Invalid User.")
         page = request.args.get('page', 1, type=int)
         pagination = ListEvent.query.filter_by(list_id=list_id). \
             order_by(ListEvent.timestamp.desc()).paginate(

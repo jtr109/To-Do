@@ -5,7 +5,7 @@ from app import restful_api
 
 from ... import db
 from ...models import Task, ToDoList, User
-from .errors import bad_request
+from .errors import bad_request, unauthorized
 
 
 post_parser = reqparse.RequestParser()
@@ -53,8 +53,9 @@ def to_json_task(task):
 class TasksAPI(Resource):
     @marshal_with(tasks_fields)
     def get(self, list_id):
-        # todo: find a better way to return bad request
         todo_list = ToDoList.query.get_or_404(list_id)
+        if todo_list.master != g.current_user:
+            return unauthorized("Invalid User.")
         todo_tasks = Task.query.filter_by(list_id=list_id, state='todo')
         doing_tasks = Task.query.filter_by(list_id=list_id, state='doing')
         done_tasks = Task.query.filter_by(list_id=list_id, state='done')
@@ -68,10 +69,9 @@ class TasksAPI(Resource):
     @marshal_with(task_fields)
     def post(self, list_id):
         args = post_parser.parse_args()
-        # todo: find a better way
         todo_list = ToDoList.query.get_or_404(list_id)
-        if todo_list.master != g.current_user():
-            return "Invalid user", 404
+        if todo_list.master != g.current_user:
+            return unauthorized("Invalid User.")
         task = Task(body=args.body, list_id=list_id)
         db.session.add(task)
         db.session.commit()
@@ -91,7 +91,7 @@ class TaskAPI(Resource):
         args = state_parser.parse_args()
         task = Task.query.filter_by(id=task_id).first()
         if task.in_list.master != g.current_user:
-            return bad_request('Invalid master.')
+            return unauthorized('Invalid master.')
         task.state = args.state
         db.session.add(task)
         db.session.commit()
@@ -101,7 +101,7 @@ class TaskAPI(Resource):
     def delete(self, task_id):
         task = Task.query.filter_by(id=task_id).first()
         if task.in_list.master != g.current_user:
-            return bad_request('Invalid master.')
+            return unauthorized('Invalid master.')
         db.session.delete(task)
         return None, 303, \
             {'Location': url_for('api2.TasksAPI', list_id=task.list_id, _external=True)}
