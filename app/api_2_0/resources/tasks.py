@@ -1,10 +1,10 @@
-from flask import jsonify, request, g, url_for
+from flask import g, url_for
 # flask-restful
 from flask_restful import Resource, fields, marshal_with, reqparse
 from app import restful_api
 
 from ... import db
-from ...models import Task
+from ...models import Task, ToDoList, User
 from .errors import bad_request
 
 
@@ -32,13 +32,14 @@ task_fields = {
 }
 
 tasks_fields = {
+    'url': fields.String,
     'todo_tasks': fields.Nested(task_fields),
     'doing_tasks': fields.Nested(task_fields),
     'done_tasks': fields.Nested(task_fields),
 }
 
 
-def jsonify_task(task):
+def to_json_task(task):
     json_task = {
         'url': url_for('api2.TaskAPI', task_id=task.id, _external=True),
         'body': task.body,
@@ -52,22 +53,29 @@ def jsonify_task(task):
 class TasksAPI(Resource):
     @marshal_with(tasks_fields)
     def get(self, list_id):
+        # todo: find a better way to return bad request
+        todo_list = ToDoList.query.get_or_404(list_id)
         todo_tasks = Task.query.filter_by(list_id=list_id, state='todo')
         doing_tasks = Task.query.filter_by(list_id=list_id, state='doing')
         done_tasks = Task.query.filter_by(list_id=list_id, state='done')
         return {
-            'todo_tasks': [jsonify_task(todo_task) for todo_task in todo_tasks],
-            'doing_tasks': [jsonify_task(doing_task) for doing_task in doing_tasks],
-            'done_tasks': [jsonify_task(done_task) for done_task in done_tasks],
+            'url': url_for('api2.TasksAPI', list_id=list_id, _external=True),
+            'todo_tasks': [to_json_task(todo_task) for todo_task in todo_tasks],
+            'doing_tasks': [to_json_task(doing_task) for doing_task in doing_tasks],
+            'done_tasks': [to_json_task(done_task) for done_task in done_tasks],
         }
 
     @marshal_with(task_fields)
     def post(self, list_id):
         args = post_parser.parse_args()
+        # todo: find a better way
+        todo_list = ToDoList.query.get_or_404(list_id)
+        if todo_list.master != g.current_user():
+            return "Invalid user", 404
         task = Task(body=args.body, list_id=list_id)
         db.session.add(task)
         db.session.commit()
-        return jsonify_task(task), 201
+        return to_json_task(task), 201
 
 restful_api.add_resource(TasksAPI, '/todo_lists/<int:list_id>/tasks/', endpoint='TasksAPI')
 
@@ -76,7 +84,7 @@ class TaskAPI(Resource):
     @marshal_with(task_fields)
     def get(self, task_id):
         task = Task.query.get_or_404(task_id)
-        return jsonify_task(task)
+        return to_json_task(task)
 
     @marshal_with(task_fields)
     def put(self, task_id):
@@ -87,7 +95,7 @@ class TaskAPI(Resource):
         task.state = args.state
         db.session.add(task)
         db.session.commit()
-        return jsonify_task(task), 202, \
+        return to_json_task(task), 202, \
             {'Location': url_for('api2.TodoListAPI', list_id=task.list_id, _external=True)}
 
     def delete(self, task_id):
@@ -96,6 +104,6 @@ class TaskAPI(Resource):
             return bad_request('Invalid master.')
         db.session.delete(task)
         return None, 303, \
-            {'Location': url_for('api2.TodoListAPI', list_id=task.list_id, _external=True)}
+            {'Location': url_for('api2.TasksAPI', list_id=task.list_id, _external=True)}
 
 restful_api.add_resource(TaskAPI, '/tasks/<int:task_id>', endpoint='TaskAPI')

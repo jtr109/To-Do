@@ -11,7 +11,7 @@ user_fields= {
 }
 
 
-def jsonify_user(user):
+def to_json_user(user):
     user_json = {
         'url': url_for('api2.UserAPI', user_id=user.id, _external=True),
         'username': user.username,
@@ -20,6 +20,7 @@ def jsonify_user(user):
     return user_json
 
 
+'''
 # should be removed in prod env
 class AllUsersAPI(Resource):
     def get(self):
@@ -28,12 +29,13 @@ class AllUsersAPI(Resource):
         return {'users': users_url}
 
 restful_api.add_resource(AllUsersAPI, '/users/', endpoint='AllUsersAPI')
+'''
 
 
 class UserAPI(Resource):
     @marshal_with(user_fields)
     def get(self, user_id):
         user = User.query.get_or_404(user_id)
-        return jsonify_user(user)
+        return to_json_user(user)
 
 restful_api.add_resource(UserAPI, '/users/<int:user_id>', endpoint='UserAPI')

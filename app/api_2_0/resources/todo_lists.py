@@ -30,14 +30,14 @@ todo_lists_fields = {
 }
 
 
-def jsonify_todo_list(todo_list):
+def to_json_todo_list(todo_list):
     json_todo_list = {
         'url': url_for('api2.TodoListAPI', list_id=todo_list.id, _external=True),
         'title': todo_list.title,
         'timestamp': todo_list.timestamp,
         'master': url_for('api2.UserAPI', user_id=todo_list.master_id, _external=True),
         'tasks': url_for('api2.TasksAPI', list_id=todo_list.id, _external=True),
-        'events': url_for('api.get_todo_list_events', list_id=todo_list.id, _external=True),
+        'events': url_for('api2.EventsAPI', list_id=todo_list.id, _external=True),
     }
     return json_todo_list
 
@@ -58,7 +58,7 @@ class TodoListsAPI(Resource):
         if pagination.has_next:
             next = url_for('api2.TodoListsAPI', page=page+1, _external=True)
         return {
-            'todo_lists': [jsonify_todo_list(t) for t in todo_lists],
+            'todo_lists': [to_json_todo_list(t) for t in todo_lists],
             'prev': prev,
             'next': next,
             'count': pagination.total
@@ -71,7 +71,7 @@ class TodoListsAPI(Resource):
         todo_list = ToDoList(title=args.title, master=master)
         db.session.add(todo_list)
         db.session.commit()
-        return jsonify_todo_list(todo_list), 201
+        return to_json_todo_list(todo_list), 201
 
 restful_api.add_resource(TodoListsAPI, '/todo_lists/', endpoint='TodoListsAPI')
 
@@ -80,13 +80,14 @@ class TodoListAPI(Resource):
     @marshal_with(todo_list_fields)
     def get(self, list_id):
         todo_list = ToDoList.query.get_or_404(list_id)
-        return jsonify_todo_list(todo_list)
+        print todo_list.master_id
+        return to_json_todo_list(todo_list)
 
     def delete(self, list_id):
         todo_list = ToDoList.query.get_or_404(list_id)
         db.session.delete(todo_list)
-        return '', 303, \
-            {'Location': url_for('api.get_todo_lists', _external=True)}
+        return None, 303, \
+            {'Location': url_for('api2.TodoListsAPI', _external=True)}
 
 restful_api.add_resource(TodoListAPI, '/todo_lists/<int:list_id>', endpoint='TodoListAPI')
 
