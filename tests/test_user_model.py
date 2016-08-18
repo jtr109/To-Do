@@ -1,7 +1,7 @@
 import time
 import unittest
-from app.models import User, Role, AnonymousUser, Permission
-from app import db, create_app
+from api_app.models import User, Role, AnonymousUser, Permission
+from api_app import db, create_app
 
 
 class UserModelTestCase(unittest.TestCase):

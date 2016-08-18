@@ -34,7 +34,7 @@ def get_task(task_id):
     return jsonify(task.to_json())
 
 
-@api.route('/tasks/<int:task_id>', methods=['PATCH'])
+@api.route('/tasks/<int:task_id>', methods=['PUT'])
 def change_state_of_task(task_id):
     task = Task.query.filter_by(id=task_id).first()
     todo_list = task.in_list

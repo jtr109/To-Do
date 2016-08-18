@@ -23,7 +23,9 @@ ADMINISTOR                  |0b10000000 (0x80)   |admin web
 管理员|0b11111111 (0xff)|所有权限，包括修改其他用户所属权限
 
 
-## API Documents
+## API Documents (v1.0)
+
+*Tips*: user '/restful_api/v2.0' for v2.0 restful api
 
 ### `GET` /api/v1.0/token
 
@@ -315,7 +317,7 @@ Parameter            | Desciption                            | Parameter Type | 
 param.email_or_token | The email or token of user            | header         | string
 param.password       | The password or None if token is used | header         | string
 
-### `PATCH` /api/v1.0/tasks/{int:task_id}
+### `PUT` /api/v1.0/tasks/{int:task_id}
 
 #### Implementation Notes
 

@@ -178,6 +178,13 @@ class User(UserMixin, db.Model):
         }
         return json_user
 
+    def get_info(self):
+        info_dict = {
+            'user_id': self.id,
+            'username': self.username,
+        }
+        return info_dict
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -231,6 +238,16 @@ class ToDoList(db.Model):
             'events': url_for('api.get_todo_list_events', list_id=self.id, _external=True),
         }
         return json_todo_list
+
+    def get_info(self):
+        info_dict = {
+            'list_id': self.id,
+            'title': self.title,
+            'timestamp': self.timestamp,
+            'master_id': self.master_id,
+        }
+        return info_dict
+
 
     @staticmethod
     def from_json(json_todo_list):
@@ -288,7 +305,6 @@ class Task(db.Model):
         body = json_todo_list.get('body')
         if body is None or body == '':
             raise ValidationError('todo list does not have a title')
-        return Task(body=body)
 
     def __repr__(self):
         return '<Task %r>' % self.id
