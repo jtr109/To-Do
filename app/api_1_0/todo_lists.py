@@ -5,7 +5,7 @@ from ..models import ToDoList
 from . import api
 
 
-@api.route('/todo_lists/')
+@api.route('/todo-lists/')
 def get_todo_lists():
     page = request.args.get('page', 1, type=int)
     pagination = ToDoList.query.filter_by(master=g.current_user).paginate(
@@ -26,7 +26,7 @@ def get_todo_lists():
     })
 
 
-@api.route('/todo_lists/', methods=['POST'])
+@api.route('/todo-lists/', methods=['POST'])
 def create_todo_list():
     todo_list = ToDoList.from_json(request.json)
     todo_list.master = g.current_user
@@ -36,13 +36,13 @@ def create_todo_list():
            {'Location': url_for('api.get_todo_list', list_id=todo_list.id, _external=True)}
 
 
-@api.route('/todo_lists/<int:list_id>')
+@api.route('/todo-lists/<int:list_id>')
 def get_todo_list(list_id):
     todo_list = ToDoList.query.get_or_404(list_id)
     return jsonify(todo_list.to_json())
 
 
-@api.route('/todo_lists/<int:list_id>', methods=['DELETE'])
+@api.route('/todo-lists/<int:list_id>', methods=['DELETE'])
 def delete_todo_list(list_id):
     todo_list = ToDoList.query.get_or_404(list_id)
     db.session.delete(todo_list)

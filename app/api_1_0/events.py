@@ -10,7 +10,7 @@ def get_event(event_id):
     return jsonify(event.to_json())
 
 
-@api.route('/todo_lists/<int:list_id>/events/')
+@api.route('/todo-lists/<int:list_id>/events/')
 def get_todo_list_events(list_id):
     page = request.args.get('page', 1, type=int)
     pagination = ListEvent.query.filter_by(list_id=list_id).paginate(
