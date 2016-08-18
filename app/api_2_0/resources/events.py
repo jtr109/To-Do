@@ -67,4 +67,4 @@ class EventsAPI(Resource):
             'count': pagination.total
         }
 
-restful_api.add_resource(EventsAPI, '/todo_lists/<int:list_id>/events/', endpoint='EventsAPI')
+restful_api.add_resource(EventsAPI, '/todo-lists/<int:list_id>/events/', endpoint='EventsAPI')
