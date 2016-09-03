@@ -5,14 +5,17 @@ from flask_mail import Mail
 from flask_login import LoginManager
 from flask_moment import Moment
 from flask_restful import Api
+from celery import Celery
 
-from config import config
+from config import config, Config
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 mail = Mail()
 moment = Moment()
 restful_api = Api()
+
+celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
@@ -29,6 +32,8 @@ def create_app(config_name):
     mail.init_app(app)
     login_manager.init_app(app)
     moment.init_app(app)
+
+    celery.conf.update(app.config)
 
     if not app.debug and not app.testing and not app.config['SSL_DISABLE']:
         from flask_sslify import SSLify
