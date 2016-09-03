@@ -6,3 +6,4 @@
 venv/
 tmp/
 app/static/Overseas.jpg
+*.rdb
